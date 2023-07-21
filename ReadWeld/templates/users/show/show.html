@@ -1,0 +1,22 @@
+{% extends "utils/show/base.html" %}
+
+{% from "utils/show/base.html" import show_options, display_card %}
+
+
+
+
+
+{% block title %}Сварщики{% endblock %}
+
+{% block list %}
+    {% for __welder in welders %}
+        {% set worker = about_worker(__welder) %}
+
+        {% call(object) display_card(__welder, worker.title) %}
+            {{ show_options("Телефон", object.phone) }}
+            {{ show_options("Категория", object.category) }}
+
+            <a class="worker_edit" href={{ url_for('users.edit_welder', id=__welder.id) }}>Редактировать</a>
+        {% endcall %}
+    {% endfor %}
+{% endblock %}

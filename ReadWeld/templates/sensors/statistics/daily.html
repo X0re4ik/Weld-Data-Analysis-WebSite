@@ -1,0 +1,129 @@
+
+{% extends "sensors/statistics/base.html" %}
+{% from "_formhelpers.html" import display_statistics %}
+
+{% block top_part %}
+    {% set data_for_daily_statistics = statistics %}
+    {% set daily_report = data_for_daily_statistics.daily_reports[0] %}
+    {% set worker = daily_report.worker %}
+    {% set welding_wire_diameter = daily_report.welding_wire_diameter.diameter %}
+    {% set weld_metal = daily_report.weld_metal %}
+
+
+    {%set data_for_daily_statistics_template1 = {
+        "average_amperage": {
+            "title": "Средняя сила тока",
+            "value": daily_report.average_amperage,
+            "ms": "А"
+        },
+        "average_gas_consumption": {
+            "title": "Средний расход газа",
+            "value": daily_report.average_gas_consumption,
+            "ms": "л/мин"
+        },
+        "average_wire_consumption": {
+            "title": "Средний расход проволки",
+            "value": daily_report.average_wire_consumption,
+            "ms": "кг/час"
+        },
+        "expended_wire": {
+            "title": "Израсходовано проволки",
+            "value": daily_report.expended_wire,
+            "ms": "кг" 
+        },
+        "expended_gas": {
+            "title": "Израсходовано газа",
+            "value": daily_report.expended_gas,
+            "ms": "л"
+        },
+        "max_amperage": {
+            "title": "Максимальный ток",
+            "value": daily_report.max_amperage,
+            "ms": "А"
+        },
+        "max_gas_consumption": {
+            "title": "Максимальный расход газа",
+            "value": daily_report.max_gas_consumption,
+            "ms": "л/мин"
+        },
+        "max_wire_consumption": {
+            "title": "Максимальный расход проволки",
+            "value": daily_report.max_wire_consumption,
+            "ms": "кг/час"
+        }
+    }
+    %}
+    {% set data_for_daily_statistics_template2 = {
+        "running_time_in_seconds": {
+            "title": "Время работы оборудования",
+            "value": working_hours(daily_report.running_time_in_seconds),
+            "ms": ""
+        },
+        "idle_time_in_seconds": {
+            "title": "Время простоя оборудования",
+            "value": working_hours(daily_report.idle_time_in_seconds),
+            "ms": ""
+        },
+        "worler": {
+            "title": "Работник",
+            "value": worker.first_name ~ " " ~ worker.second_name ~ " (" ~ worker.phone ~ ")",
+            "ms": ""
+        },
+        "welding_wire_diameter": {
+            "title": "Диаметр используемой проволки",
+            "value": welding_wire_diameter,
+            "ms": "мм."
+        },
+        "weld_metal": {
+            "title": "Материал проволки",
+            "value": weld_metal.steel_name ~ " (" ~ weld_metal.density ~ " кг/м³)",
+            "ms": ""
+        },
+        "choose-interval": {
+            "title": "Интервал",
+            "value": '<input type="number" id="choose-interval" value="15" min="10" max="45" step="5">',
+            "ms": ""
+        },
+        "choose-date": {
+            "title": "Дата",
+            "value": '<input type="date" id="choose-date" name="trip-start" value="" min="2023-01-01" max="2030-01-01" required>',
+            "ms": ""
+        },
+        "choose-": {
+            "title": "",
+            "value": '<input type="submit" id="refresh-button" value="Обновить">',
+            "ms": ""
+        }
+    }
+    %}
+    {% set data_for_daily_statistics_templates = [data_for_daily_statistics_template1, data_for_daily_statistics_template2] %}
+
+    {% for template in data_for_daily_statistics_templates %}
+        <div class="stat_details__col">
+            <h2 class="stat_title"></h2>
+            {% for key, value in template.items() %}
+                <div class="stat_detail">
+                    {{display_statistics(value)}}
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+{% endblock %}
+
+{% block graphics %}
+    {% for i in range(4) %}
+        <canvas class="graphic daily-chart" height></canvas>
+    {% endfor %}
+{% endblock %}
+
+{% block statistics_javascript %}
+    <script src="/static/js/sensors/statistics/daily.js"></script>
+    <script>PageHandle.init()</script>
+    <script>
+        
+        var statistics = {{ python_object_to_json(statistics.measurements.data) |safe }};
+        var dailyСharts = document.getElementsByClassName("daily-chart");
+        creatCharts(dailyСharts, statistics)
+    </script>
+{% endblock %}
+

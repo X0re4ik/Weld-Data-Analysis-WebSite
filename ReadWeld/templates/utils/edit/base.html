@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block main_content %}
+
+    <div>
+        <h1 class="title2">{% block title %}{% endblock %}</h1>
+        <div class="editbox">
+            <form method="{{ method | d("POST") }}" action="{{ form_action }}" id="edit">
+                {{ form.csrf_token }}
+                <dl>
+                    {% block edit_form %}
+                    {% endblock %}
+                </dl>
+                
+                {{ form.submit }}
+            </form>
+
+            <div class="proizvod">
+                <h2 class="title3">Производительность</h2>
+                <canvas class="performance-pie-chart"></canvas>
+                <script src="/static/js/creat-pie-chart.js"></script>
+                <script>
+                    
+                    let elements = document.getElementsByClassName("performance-pie-chart");
+                    const performance = {{ performances | safe}};
+                    creatPerformancePieCharts(elements, performance);
+                </script>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

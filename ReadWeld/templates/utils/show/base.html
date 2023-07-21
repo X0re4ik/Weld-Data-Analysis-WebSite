@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+
+{% macro show_options(title, value, ms="") -%}
+    <p class="worker_category">
+        {{title}}:
+        <span class="worker_category__value">{{value}} {{ms}}</span>
+    </p>
+{%- endmacro %}
+
+{% macro display_card(object, title) -%}
+
+    <li class="worker">
+        <canvas class="worker_photo performance-pie-chart"></canvas>
+        <h3 class="worker_name">{{title}}</h3>
+        {{ caller(object) }}
+    </li>
+
+{%- endmacro %}
+
+
+
+{% block main_content %}
+
+    <h1 class="title">
+        {% block title %}{% endblock %}
+    </h1>
+
+
+    <ul class="workers">
+        {% block list %}{% endblock %}
+    </ul>
+
+    <script src="/static/js/creat-pie-chart.js"></script>
+    <script>
+        let elements = document.getElementsByClassName("performance-pie-chart");
+        const performance = {{ performances | safe}};
+        creatPerformancePieCharts(elements, performance);
+    </script>
+
+{% endblock %}

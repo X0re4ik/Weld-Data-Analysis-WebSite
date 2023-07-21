@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+
+
+{% block main_content %}
+    {% from "_formhelpers.html" import render_field %}
+    <form method="{{ method | d("POST") }}" action="{{ form_action }}">
+        {{ form.csrf_token }}
+        <div class="d-flex justify-content-center">
+            <dl>
+                {{ render_field(form.first_name) }}
+                {{ render_field(form.second_name) }}
+                {{ render_field(form.phone) }}
+                {{ render_field(form.category) }}
+            </dl>
+            {{ form.submit }}
+        </div>
+    </form>
+    
+{% endblock %}

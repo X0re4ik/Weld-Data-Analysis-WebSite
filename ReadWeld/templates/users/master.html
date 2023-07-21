@@ -1,0 +1,23 @@
+{% extends "users/base.html" %}
+
+
+
+{% block registration_form %}
+    {% from "users/_formhelpers.html" import render_field %}
+    <form method="{{ method | d("POST") }}" action="{{ form_action }}">
+        {{ form.csrf_token }}
+        <dl>
+            {{ render_field(form.first_name) }}
+            {{ render_field(form.second_name) }}
+            {{ render_field(form.phone) }}
+            {{ render_field(form.email) }}
+            {{ render_field(form.notification) }}
+            {% if id_registration %}
+                {{ render_field(form.password) }}
+                {{ render_field(form.confirm_password) }}
+            {% endif %}
+            
+        </dl>
+        {{ form.submit }}
+    </form>
+{% endblock %}

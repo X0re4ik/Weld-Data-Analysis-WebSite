@@ -1,0 +1,24 @@
+{% extends "utils/show/base.html" %}
+
+{% from "utils/show/base.html" import show_options, display_card %}
+
+
+
+
+
+{% block title %}Устройства{% endblock %}
+
+{% block list %}
+    {% for __sensor in sensors %}
+        {% set sensor = about_sensor(__sensor) %}
+
+        {% call(object) display_card(__sensor, sensor.name) %}
+            {{ show_options("Расположение", object.location) }}
+            {{ show_options("Период измерения", object.measurement_period, "c") }}
+            {{ show_options("Диаметр проволки", object.welding_wire_diameter.diameter, "мм") }}
+            {{ show_options("Металл", object.weld_metal.steel_name) }}
+            <a class="worker_edit" href={{ url_for('sensors.edit_settings', mac_address=__sensor.mac_address) }}>Редактировать</a>
+            <a class="worker_edit" href="{{ url_for('sensors.weekly-statistics-view', mac_address=__sensor.mac_address, year=[year], number_of_week=[number_of_week], interval=[15])}}">Статистика</a>
+        {% endcall %}
+    {% endfor %}
+{% endblock %}

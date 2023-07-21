@@ -1,0 +1,24 @@
+{% extends 'utils/edit/base.html' %}
+{% from "_formhelpers.html" import render_field %}
+
+
+
+{% block title %}
+    Устройство {{sensor.device_name}} ({{sensor.mac_address}})
+{% endblock %}
+
+
+{% block edit_form %}
+
+    {{ render_field(form.device_name) }}
+    {{ render_field(form.location) }}
+    {{ render_field(form.measurement_period) }}
+
+    {{ render_field(form.worker_id) }}
+    {{ render_field(form.welding_wire_diameter_id) }}
+    {{ render_field(form.weld_metal_id) }}
+
+    {{ render_field(form.begining_of_work_day) }}
+    {{ render_field(form.end_of_working_day) }}
+
+{% endblock %}

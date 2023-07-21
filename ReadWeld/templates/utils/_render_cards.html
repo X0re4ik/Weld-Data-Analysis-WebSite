@@ -1,0 +1,11 @@
+{% macro render_cards(values) -%}
+    {% for i in range(0, (values|length / 3)|round|int) %}
+    <div class="d-flex flex-row">
+        {% for j in range(3*i, 3*(i+1)) %}
+            {% if j < values|length %}
+                {{ caller(j) }}
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endfor %}
+{%- endmacro %}

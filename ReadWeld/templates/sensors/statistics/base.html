@@ -1,0 +1,58 @@
+
+
+
+{% macro show_sensor_characteristics(sensor, performances) %}
+    <div class="stat_item">
+        {% set sensor_value = about_sensor(sensor) %}
+        {% if (sensor_value and performances) %}
+            <h2 class="stat_title">
+                <a href={{ sensor_value.href }}>
+                    <abbr title="{{sensor_value.cheats}}">{{sensor_value.name}}</abbr>
+                </a>
+            </h2>
+            <div class="">
+                <canvas class="performance-pie-chart"></canvas>
+                <script src="/static/js/creat-pie-chart.js"></script>
+                <script>
+                    let elements = document.getElementsByClassName("performance-pie-chart");
+                    const performance = {{ python_object_to_json(performances) |safe }};
+                    creatPerformancePieCharts(elements, performance);
+                </script>
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+
+{% extends "base.html" %}
+{% block main_content %}
+    {% set performances                         = statistics.performances %}
+    {% set sensor                               = statistics.sensor %}
+
+    <div class="stat">
+        {{ show_sensor_characteristics(sensor, performances) }}
+        
+        <div class="stat_details">
+            <div class="stat_details__row">
+                {% block top_part %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <div class="graphics">
+        {% block graphics %}
+        {% endblock %}
+    </div>
+
+
+    <script src="/static/js/classes/CustomPeriod.js"></script>
+    <script src="/static/js/classes/DailyReport.js"></script>
+    <script src="/static/js/classes/Worker.js"></script>
+    <script src="/static/js/sensors/statistics/__base.js"></script>
+
+    {% block statistics_javascript %}
+    {% endblock %}
+
+
+{% endblock %}

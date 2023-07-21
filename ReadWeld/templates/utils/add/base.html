@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block main_content %}
+
+    <div>
+        <h1 class="title2">{% block title %}{% endblock %}</h1>
+        <form method="{{ method | d("POST") }}" action="{{ form_action }}" id="add">
+            {{ form.csrf_token }}
+            <dl>
+                {% block add_form %}
+                {% endblock %}
+            </dl>
+            
+            {{ form.submit }}
+        </form>
+    </div>
+
+{% endblock %}

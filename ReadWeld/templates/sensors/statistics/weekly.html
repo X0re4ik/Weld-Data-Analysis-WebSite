@@ -1,0 +1,98 @@
+{% extends "sensors/statistics/base.html" %}
+{% from "_formhelpers.html" import display_statistics %}
+
+{% set data_for_weekly_statistics = statistics %}
+{% set daily_reports                        = data_for_weekly_statistics.daily_reports %}
+{% set total_work_and_idle_time             = data_for_weekly_statistics.total_work_and_idle_time %}
+{% set total_spent_wire_and_gas             = data_for_weekly_statistics.total_spent_wire_and_gas %}
+{% set best_daily_report                    = data_for_weekly_statistics.best_daily_report %}
+{% set best_worker                          = data_for_weekly_statistics.best_worker %}
+
+
+
+
+
+{% block top_part %}
+    <div class="stat_details__col">
+        {% set start_date = daily_reports[0].date %}
+        {% set end_date = daily_reports[-1].date %}
+        <h2 class="stat_title">
+            Неделя с 
+            <span>{{start_date.day}}/{{start_date.month}}/{{start_date.year}}</span>
+            по
+            <span>{{end_date.day}}/{{end_date.month}}/{{end_date.year}}</span>
+        </h2>
+        {% set data_for_daily_statistics_template1 = {
+            "expended_wire": {
+                "title": "Израсходовано проволки",
+                "value": total_spent_wire_and_gas.0,
+                "ms": "кг" 
+            },
+            "expended_gas": {
+                "title": "Израсходовано газа",
+                "value": total_spent_wire_and_gas.1,
+                "ms": "л"
+            },
+            "total_work": {
+                "title": "Время работа",
+                "value": working_hours(total_work_and_idle_time.0),
+                "ms": ""
+            },
+            "total_idle": {
+                "title": "Время простоя",
+                "value": working_hours(total_work_and_idle_time.1),
+                "ms": ""
+            },
+            "best_daily_report": {
+                "title": "Лучший день",
+                "value": date_on_day_of_week(best_daily_report.date.year, best_daily_report.date.month, best_daily_report.date.day),
+                "ms": ""
+            },
+            "best_worker": {
+                "title": "Лучший сварщик",
+                "value": best_worker.first_name ~ " " ~ best_worker.second_name ~" " ~ " (" ~ best_worker.phone ~")" if best_worker else "Пеннивайз 🤡",
+                "ms": "",
+                "href": url_for('users.edit_welder', id=best_worker.id) if best_worker else None
+            },
+            "choose-week": {
+                "title": "Неделя",
+                "value": '<input type="week" name="choose-week" id="choose-week" min="2023-W1" max="2030-W1" value="" required>',
+                "ms": "",
+            },
+            "choose-": {
+                "title": "",
+                "value": '<input type="submit" id="refresh-button" value="Обновить">',
+                "ms": ""
+            }
+        }%}
+        
+
+        {% for key, value in data_for_daily_statistics_template1.items() %}
+            <div class="stat_detail">
+                {{display_statistics(value)}}
+            </div>
+        {% endfor %}
+        
+    </div>
+{% endblock %}
+
+
+{% block graphics %}
+    <div class="graphic graphic_sm">
+        <div id='for-data'  class="stat_details__col"></div>
+    </div>
+    
+    {% for i in range(3) %}
+        <div class="graphic graphic_sm">
+            <canvas class="weekly-charts"></canvas>
+        </div>
+    {% endfor %}
+{% endblock %}
+
+
+{% block statistics_javascript %}
+    <script src="/static/js/sensors/statistics/weekly.js"></script>
+    <script>
+        pageHandle.dataСollection({{ python_object_to_json(daily_reports) |safe }}).creatAuxiliaryCharts(); 
+    </script>
+{% endblock %}
