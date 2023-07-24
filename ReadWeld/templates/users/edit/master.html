@@ -1,0 +1,17 @@
+{% extends 'utils/add/base.html' %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block title %}
+    Добавить сварщика
+{% endblock %}
+
+
+{% block add_form %}
+
+    {{ render_field(form.first_name) }}
+    {{ render_field(form.second_name) }}
+    {{ render_field(form.phone) }}
+    {{ render_field(form.email) }}
+    {{ render_field(form.notification) }}
+
+{% endblock %}

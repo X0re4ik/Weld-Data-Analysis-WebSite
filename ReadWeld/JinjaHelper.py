@@ -2,7 +2,10 @@
 import json
 
 
-from datetime import datetime, timedelta 
+from datetime import datetime, timedelta
+
+from ReadWeld.models import Master, Worker
+from flask import url_for
 class JinjaHelper:
     
     
@@ -21,6 +24,7 @@ class JinjaHelper:
         
         app.jinja_env.globals.update(about_sensor=JinjaHelper.about_sensor)
         app.jinja_env.globals.update(about_worker=JinjaHelper.about_worker)
+        app.jinja_env.globals.update(about_master=JinjaHelper.about_master)
         
         
         
@@ -94,6 +98,17 @@ class JinjaHelper:
 
         values = [
             mac, name, worker, href, cheats
+        ]
+        return dict(zip(keys, values))
+    
+    def about_master(worker_id):
+        master = Master.query.filter(Master.worker_id == worker_id).first()
+        if not master: return None
+        worker = Worker.query.filter(Worker.id == worker_id).first()
+        href = url_for("users.edit_master", id=worker.id)
+        keys = ["title", "href"]
+        values = [
+            worker.first_name + " " + worker.second_name, href
         ]
         return dict(zip(keys, values))
         

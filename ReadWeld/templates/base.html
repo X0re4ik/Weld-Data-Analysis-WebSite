@@ -36,7 +36,16 @@
             <aside>
                 <div class="user">
                     <h2 class="user_name">
-                        <span class="user_name__value">Мочалов Антон</span>
+                        {% if masterID %}
+                            {% set info_about_master = about_master(masterID) %}
+                            {% set title = info_about_master.title if info_about_master else "Неизвестно" %}
+                            {% set href = info_about_master.href if info_about_master else "Неизвестно" %}
+                        {% else %}
+                            {% set title = "Неизвестно" %}
+                            {% set href = "" %}
+
+                        {% endif %}
+                        <a href="{{href}}" class="user_name__value">{{title}}</a>
                     </h2>
                     <a class="user_exit" href="#">Выйти</a>
                 </div>
