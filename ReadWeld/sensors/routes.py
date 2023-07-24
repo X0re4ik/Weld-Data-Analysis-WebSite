@@ -3,7 +3,8 @@ from ReadWeld.sensors import sensors
 from ReadWeld.sensors.controllers import (
     DailyStatisticsView,
     WeeklyStatisticsView,
-    ShowSensorsView
+    ShowSensorsView,
+    SelectIntervalForDisplayingStatisticsView
 )
 
 
@@ -15,3 +16,6 @@ sensors.add_url_rule("/sensor/<string:mac_address>/statistics/daily",
 
 sensors.add_url_rule("/sensor/<string:mac_address>/statistics/weekly", 
                      view_func=WeeklyStatisticsView.as_view("weekly-statistics-view"))
+
+sensors.add_url_rule("/sensors/choose-statistics", 
+                     view_func=SelectIntervalForDisplayingStatisticsView.as_view("choose-statistics"))

@@ -56,8 +56,22 @@ class ShowSensorsView(View):
         )
         
 
-        
 
+
+class SelectIntervalForDisplayingStatisticsView(View):
+    def __init__(self) -> None:
+        self.template = "/".join(
+            ("sensors", "choose", "choose.html")
+        )    
+
+    def dispatch_request(self):
+        sensors = Sensor.query.filter().all()
+        sensors = [sensor.to_dict() for sensor in sensors]
+        return render_template(
+            self.template,
+            sensors=sensors
+        )
+        
 
 
 @sensors.route("/sensor/<string:mac_address>/edit", methods=['POST', "GET"])

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+
+{% set sensors = sensors %}
+{% block main_content %}
+    <h1 class="title2">Выпрать период статистики</h1>
+    <form id="add">
+        <label for="choose-week">Выберете неделю</label>
+        <input type="week" name="choose-week" id="choose-week" min="2023-W1" max="2030-W1" value="">
+        
+        <label for="choose-date">Выберете день недели</label>
+        <input type="date" id="choose-date" name="trip-start" value="" min="2023-01-01" max="2030-01-01">
+
+        <label for="RW-senors">Выберете датчик</label>
+        <select name="RW-senors" id="RW-senors">
+            {% for sensor in sensors %}
+                {% set info_about_sensor = about_sensor(sensor) %}
+                <option value="{{info_about_sensor.mac}}" title="{{info_about_sensor.cheats}}">
+                    {{ info_about_sensor.name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <input type="submit" id="submit" value="Показать">
+        
+    </form>
+
+    <script type="text/javascript">
+        
+        document.getElementById("submit").onclick = () => {
+            const choosedWeek = document.getElementById('choose-week');
+            const choosedDay = document.getElementById('choose-date');
+            const macAddress = document.getElementById('RW-senors').value;
+
+            var urlNewPage = null;
+            var pathName = `/sensor/${macAddress}/statistics/`
+            const currentURL = new URL(window.location.href);
+
+
+            const weekValue = choosedWeek.value;
+            const dayValue = choosedDay.value;
+
+            if (weekValue) {
+                pathName += "weekly"
+                urlNewPage = new URL(currentURL.origin + pathName);
+
+                let [year, numberOfWeek] = weekValue.split("-");
+
+                numberOfWeek = numberOfWeek.substr(1);
+                urlNewPage.searchParams.set("year", year);
+                urlNewPage.searchParams.set("number_of_week", numberOfWeek);
+
+            }
+            else if (dayValue) { 
+                pathName += "daily"
+                urlNewPage = new URL(currentURL.origin + pathName);
+                let [year, month, day] = dayValue.split("-");
+
+                year = (new Number(year)).valueOf();
+                month = (new Number(month)).valueOf();
+                day = (new Number(day)).valueOf();
+
+                urlNewPage.searchParams.set("year", year);
+                urlNewPage.searchParams.set("month", month);
+                urlNewPage.searchParams.set("day", day);
+                
+                urlNewPage.searchParams.set("interval", 15);
+            }
+            if (weekValue || dayValue) window.open(urlNewPage.href)
+        }
+    </script>
+
+{% endblock  %}
