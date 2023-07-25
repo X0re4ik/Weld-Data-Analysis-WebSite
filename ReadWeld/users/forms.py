@@ -81,7 +81,7 @@ class MasterLoginForm(FlaskForm):
     submit = SubmitField('Войти')
 
 
-class WelderRegistration(WelderForm, SubmitAdd):
+class WelderRegistration(WelderForm, SubmitAdd, ChecksForWelder):
     pass
 
 

@@ -7,20 +7,26 @@ from ReadWeld.models import (
     Measurement, Worker, 
     DailyReport)
 
+
+
+class NotFindRWSensorException(Exception):
+    def __init__(self, mac_address) -> None:
+        self.__mac_address = mac_address
+        self.message = f"RW устройство с MAC адрессом {self.__mac_address} не найдено"
+        
 class LackOfStatisticsForPeriodException(Exception):
     def __init__(self, start, end) -> None:
         self.start = start
         self.end = end
         self.message = f"За данный период (c {self.start} по {self.end}) отсутсвует какая-либо статистика"
         super().__init__(self.message)
-     
+
+
+    
 class __Statistics:
     def __init__(self, mac_address: str, start: datetime, end: datetime) -> None:
         self.sensor = Sensor.query.filter_by(mac_address=mac_address).first()
-        if not self.sensor:
-            raise RuntimeError(
-                f"Устройство с MAC-адрессом {mac_address} не найдено"
-            )
+        if not self.sensor: raise NotFindRWSensorException(mac_address)
         self.start  = start
         self.end    = end
         

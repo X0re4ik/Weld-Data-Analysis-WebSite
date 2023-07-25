@@ -14,17 +14,12 @@ from ReadWeld.models import Sensor
 from ReadWeld.sensors.utils import (
     WeeklyStatistics,
     DailyStatistics,
-    LackOfStatisticsForPeriodException)
+    NotFindRWSensorException
+)
 
 
 from ReadWeld.sensors import sensors
 
-class SensorError:
-    def __init__(self, message = "Ошибка") -> None:
-        self.message = message
-    
-    def render_template(self):
-        return self.message
 
     
 class ShowSensorsView(View):
@@ -77,6 +72,7 @@ class SelectIntervalForDisplayingStatisticsView(View):
 @sensors.route("/sensor/<string:mac_address>/edit", methods=['POST', "GET"])
 def edit_settings(mac_address: str):
     sensor = Sensor.query.filter_by(mac_address=mac_address).first()
+    if not sensor: raise NotFindRWSensorException(mac_address)
     
     form = SensorForm(
         device_name=sensor.device_name,
@@ -105,6 +101,8 @@ def edit_settings(mac_address: str):
         sensor=sensor.to_dict(),
         performances=performances)
 
+
+
 class _StatisticsView(View, ABC):
     methods = ["GET"]
     
@@ -115,15 +113,12 @@ class _StatisticsView(View, ABC):
             ("sensors", "statistics", title)
         )
         
-        self.__redirect_if_error = SensorError()
+        self.__redirect_if_error = "not_found_error"
         self._statistics = None
     
     def __later_init__(self, mac_address: str):
         self._sensor = Sensor.query.filter_by(mac_address=mac_address).first()
-        if not self._sensor:
-            raise RuntimeError(
-                f"Устройство с MAC-адрессом {mac_address} не найдено"
-            )
+        if not self._sensor: raise NotFindRWSensorException(mac_address)
         
 
     def data_to_dict(self):
@@ -144,11 +139,7 @@ class _StatisticsView(View, ABC):
         }
         
     def dispatch_request(self, mac_address: str):
-        try:
-            self.__later_init__(mac_address)
-        except LackOfStatisticsForPeriodException:
-            #return redirect(self.__redirect_if_error)
-            return self.__redirect_if_error.render_template()
+        self.__later_init__(mac_address)
         
         statistics = self.data_to_dict()
         return render_template(self.template, statistics=statistics)

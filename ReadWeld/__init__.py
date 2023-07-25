@@ -12,7 +12,7 @@ db = SQLAlchemy()
 from ReadWeld.models import *
 from ReadWeld.JinjaHelper import JinjaHelper
 
-
+from flask import render_template
 def create_app():
     print(__name__)
     app = Flask(__name__)
@@ -34,6 +34,21 @@ def create_app():
     from ReadWeld.sensors.routes import sensors
     app.register_blueprint(sensors)
     
-    
-    
     return app
+
+
+app = create_app()
+
+from werkzeug.exceptions import HTTPException
+
+# @app.errorhandler(404)
+# def not_found_error(error):
+#     return render_template('error.html', error_description=error, error_code=404), 404
+
+
+# @app.errorhandler(Exception)
+# def handle_exception(error):
+#     if isinstance(error, HTTPException):
+#         return error
+    
+#     return render_template("error.html", error_description=error), 500
