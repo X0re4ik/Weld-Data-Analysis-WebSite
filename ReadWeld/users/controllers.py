@@ -15,6 +15,8 @@ class WelderAddView(View):
     
     methods=['GET', 'POST']
     
+    decorators = [login_required]
+    
     def __init__(self) -> None:
         self.template = "/".join(
             ("users", "add", "add.html")
@@ -37,11 +39,13 @@ class WelderAddView(View):
             db.session.commit()
             
             return redirect(url_for('users.add_welder'))
-        return render_template(self.template, form=form)
+        return render_template(self.template, form=form, masterID=current_user.get_id())
 
 class WeldersShowView(View):
     
     methods=['GET']
+    
+    decorators = [login_required]
     
     def __init__(self) -> None:
         self.template = "/".join(
@@ -64,6 +68,8 @@ class WeldersShowView(View):
 class WelderEditView(View):
     
     methods=['GET', 'POST']
+    
+    decorators = [login_required]
     
     def __init__(self) -> None:
         self.template = "/".join(
@@ -89,12 +95,19 @@ class WelderEditView(View):
             self.template,
             form=form,
             welder=welder.to_dict(),
-            performances=[list(worker.calculate_performance())])
+            performances=[list(worker.calculate_performance())], masterID=current_user.get_id())
     
 
 class MasterLoginView(View):
+    
     methods = ["POST", "GET"]
 
+    def __init__(self) -> None:
+        self.template = "/".join(
+            ("users", "login_master.html")
+        )
+        
+    
     def dispatch_request(self):
         if current_user.is_authenticated:
             return redirect(url_for('users.show_welders'))
@@ -112,12 +125,14 @@ class MasterLoginView(View):
                 if not url_has_allowed_host_and_scheme(next, request.host):
                     return abort(400)
                 return redirect(next or url_for('users.login_master'))
-        return render_template("/users/login_master.html", form=form)
+        return render_template(self.template, form=form, masterID=current_user.get_id())
 
 
 class MasterEditView(View):
     
     methods = ["POST", "GET"]
+    
+    decorators = [login_required]
     
     
     def __init__(self) -> None:

@@ -29,6 +29,7 @@ class ShowSensorsView(View):
     """
     
     methods=['GET']
+    decorators = [login_required]
     
     def __init__(self) -> None:
         super().__init__()
@@ -47,64 +48,88 @@ class ShowSensorsView(View):
             self.template,
             sensors=_sensors,
             performances=performances,
-            year=year, number_of_week=number_of_week, day=day
+            year=year, number_of_week=number_of_week, day=day,
+            masterID=current_user.get_id()
         )
         
 
 
 
 class SelectIntervalForDisplayingStatisticsView(View):
+    
+    methods=["GET"]
+    
+    decorators = [login_required]
+    
+    
     def __init__(self) -> None:
         self.template = "/".join(
             ("sensors", "choose", "choose.html")
-        )    
+        )
 
     def dispatch_request(self):
         sensors = Sensor.query.filter().all()
         sensors = [sensor.to_dict() for sensor in sensors]
         return render_template(
             self.template,
-            sensors=sensors
+            sensors=sensors,
+            masterID=current_user.get_id()
         )
         
 
 
-@sensors.route("/sensor/<string:mac_address>/edit", methods=['POST', "GET"])
-def edit_settings(mac_address: str):
-    sensor = Sensor.query.filter_by(mac_address=mac_address).first()
-    if not sensor: raise NotFindRWSensorException(mac_address)
+
+class SensorEditView(View):
     
-    form = SensorForm(
-        device_name=sensor.device_name,
-        location=sensor.location,
-        measurement_period=sensor.measurement_period,
+    methods=['POST', "GET"]
+    
+    decorators = [login_required]
+    
+    def __init__(self) -> None:
+        self.template = "/".join(
+            ("sensors", "edit", "edit.html")
+        )
         
-        worker_id=sensor.worker_id,
-        welding_wire_diameter_id=sensor.welding_wire_diameter_id,
-        weld_metal_id=sensor.weld_metal_id,
+    def dispatch_request(self, mac_address: str):
+        sensor = Sensor.query.filter_by(mac_address=mac_address).first()
+        if not sensor: raise NotFindRWSensorException(mac_address)
         
-        begining_of_work_day=sensor.begining_of_work_day,
-        end_of_working_day=sensor.end_of_working_day
-    )
+        form = SensorForm(
+            device_name=sensor.device_name,
+            location=sensor.location,
+            measurement_period=sensor.measurement_period,
+            
+            worker_id=sensor.worker_id,
+            welding_wire_diameter_id=sensor.welding_wire_diameter_id,
+            weld_metal_id=sensor.weld_metal_id,
+            
+            begining_of_work_day=sensor.begining_of_work_day,
+            end_of_working_day=sensor.end_of_working_day
+        )
+        
+        if form.validate_on_submit():
+            form.worker_id.data = None if not form.worker_id.data else form.worker_id.data
+            form.populate_obj(sensor)
+            db.session.commit()
+            return redirect(url_for('sensors.edit_settings', mac_address=mac_address))
+        
+        performances = [list(sensor.calculate_performance())]
+        
+        return render_template(
+            self.template, 
+            form=form,
+            sensor=sensor.to_dict(),
+            performances=performances,
+            masterID=current_user.get_id())
     
-    if form.validate_on_submit():
-        form.worker_id.data = None if not form.worker_id.data else form.worker_id.data
-        form.populate_obj(sensor)
-        db.session.commit()
-        return redirect(url_for('sensors.edit_settings', mac_address=mac_address))
-    
-    performances = [list(sensor.calculate_performance())]
-    
-    return render_template(
-        'sensors/edit/edit.html', 
-        form=form,
-        sensor=sensor.to_dict(),
-        performances=performances)
 
 
 
 class _StatisticsView(View, ABC):
+    
     methods = ["GET"]
+    
+    decorators = [login_required]
     
     def __init__(self, _type) -> None:
         title = "weekly" if _type == "w" else "daily"
@@ -142,7 +167,7 @@ class _StatisticsView(View, ABC):
         self.__later_init__(mac_address)
         
         statistics = self.data_to_dict()
-        return render_template(self.template, statistics=statistics)
+        return render_template(self.template, statistics=statistics, masterID=current_user.get_id())
 
 
 class WeeklyStatisticsView(_StatisticsView):

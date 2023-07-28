@@ -25,12 +25,12 @@
         {% set data_for_daily_statistics_template1 = {
             "expended_wire": {
                 "title": "Израсходовано проволки",
-                "value": total_spent_wire_and_gas.0,
+                "value": total_spent_wire_and_gas.0 | round(2),
                 "ms": "кг" 
             },
             "expended_gas": {
                 "title": "Израсходовано газа",
-                "value": total_spent_wire_and_gas.1,
+                "value": total_spent_wire_and_gas.1 | round(2),
                 "ms": "л"
             },
             "total_work": {
@@ -47,12 +47,6 @@
                 "title": "Лучший день",
                 "value": date_on_day_of_week(best_daily_report.date.year, best_daily_report.date.month, best_daily_report.date.day),
                 "ms": ""
-            },
-            "best_worker": {
-                "title": "Лучший сварщик",
-                "value": best_worker.first_name ~ " " ~ best_worker.second_name ~" " ~ " (" ~ best_worker.phone ~")" if best_worker else "Пеннивайз 🤡",
-                "ms": "",
-                "href": url_for('users.edit_welder', id=best_worker.id) if best_worker else None
             },
             "choose-week": {
                 "title": "Неделя",

@@ -84,27 +84,27 @@ DailyReport.prototype.createForHTML = function(parent) {
 
     const variables = [
         {
-            value: this.averageAmperage,
+            value: this.averageAmperage.toFixed(2),
             title: "Средняя сила тока",
             measurementSystem: " А"
         },
         {
-            value: this.averageGasConsumption,
+            value: this.averageGasConsumption.toFixed(2),
             title: "Средний расход газа",
             measurementSystem: " л/час"
         },
         {
-            value: this.averageWireConsumption,
+            value: this.averageWireConsumption.toFixed(2),
             title: "Средний расход провлоки",
             measurementSystem: " кг/час"
         },
         {
-            value: this.expendedWire,
+            value: this.expendedWire.toFixed(2),
             title: "Потрачено сварочной проволки",
             measurementSystem: " кг"
         },
         {
-            value: this.expendedGas,
+            value: this.expendedGas.toFixed(2),
             title: "Потрачено сварочного газа",
             measurementSystem: " л"
         },

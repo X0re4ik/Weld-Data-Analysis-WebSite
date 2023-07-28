@@ -20,3 +20,20 @@ users.add_url_rule("/users/login",
 
 users.add_url_rule("/users/<int:id>/edit", 
                      view_func=MasterEditView.as_view("edit_master"))
+
+
+from flask_login import logout_user
+from flask import redirect, url_for
+
+@users.route("/users/logout", methods=["POST", "GET"])
+def logout():
+    logout_user()
+    return redirect(url_for("users.login_master"))
+
+
+from flask_login import logout_user
+from flask import redirect, url_for
+
+@users.route("/", methods=["POST", "GET"])
+def start():
+    return redirect(url_for("users.login_master"))

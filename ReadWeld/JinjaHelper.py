@@ -88,7 +88,7 @@ class JinjaHelper:
         mac = sensor["mac_address"]
         name = sensor["device_name"]
         worker = JinjaHelper.about_worker(sensor["worker"])
-        href = f"/sensor/{mac}/edit"
+        href = url_for("sensors.edit_settings", mac_address=mac)
         cheats = "MAC: {0}\nНазвание: {1}\nРасположение: {2}\nСварщик: {3}".format(
             mac,
             name,

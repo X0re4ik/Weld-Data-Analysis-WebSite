@@ -76,7 +76,7 @@ class __Statistics:
             else:
                 day = self.start + timedelta(days=i)
                 _in_dict['date'] = {
-                    "yaer": day.year,
+                    "year": day.year,
                     "month": day.month,
                     "day": day.day
                 }

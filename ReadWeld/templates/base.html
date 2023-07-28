@@ -47,7 +47,10 @@
                         {% endif %}
                         <a href="{{href}}" class="user_name__value">{{title}}</a>
                     </h2>
-                    <a class="user_exit" href="#">Выйти</a>
+                    <a class="user_exit" href={{url_for('users.logout')}} >Выйти</a>
+                    <script>
+
+                    </script>
                 </div>
                 <ul class="menu">
                     {% set navigation_bar_blocks = {
@@ -77,13 +80,7 @@
                         }, 
                         "Статистика": {
                             "title": "Статистика",
-                            "href": "#",
-                            "img_src": "book",
-                            "alt": "ЗИТ",
-                        },
-                        "Прямой эфир": {
-                            "title": "Прямой эфир",
-                            "href": "#",
+                            "href": url_for('sensors.statistics'),
                             "img_src": "book",
                             "alt": "ЗИТ",
                         }

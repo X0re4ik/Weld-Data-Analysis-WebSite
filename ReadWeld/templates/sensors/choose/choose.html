@@ -33,8 +33,9 @@
             const macAddress = document.getElementById('RW-senors').value;
 
             var urlNewPage = null;
-            var pathName = `/sensor/${macAddress}/statistics/`
             const currentURL = new URL(window.location.href);
+            var pathName = `/sensors/statistics/${macAddress}/`
+
 
 
             const weekValue = choosedWeek.value;

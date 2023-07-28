@@ -13,42 +13,42 @@
     {%set data_for_daily_statistics_template1 = {
         "average_amperage": {
             "title": "Средняя сила тока",
-            "value": daily_report.average_amperage,
+            "value": daily_report.average_amperage | round(2),
             "ms": "А"
         },
         "average_gas_consumption": {
             "title": "Средний расход газа",
-            "value": daily_report.average_gas_consumption,
+            "value": daily_report.average_gas_consumption | round(2),
             "ms": "л/мин"
         },
         "average_wire_consumption": {
             "title": "Средний расход проволки",
-            "value": daily_report.average_wire_consumption,
+            "value": daily_report.average_wire_consumption | round(2),
             "ms": "кг/час"
         },
         "expended_wire": {
             "title": "Израсходовано проволки",
-            "value": daily_report.expended_wire,
+            "value": daily_report.expended_wire | round(2),
             "ms": "кг" 
         },
         "expended_gas": {
             "title": "Израсходовано газа",
-            "value": daily_report.expended_gas,
+            "value": daily_report.expended_gas | round(2),
             "ms": "л"
         },
         "max_amperage": {
             "title": "Максимальный ток",
-            "value": daily_report.max_amperage,
+            "value": daily_report.max_amperage | round(2),
             "ms": "А"
         },
         "max_gas_consumption": {
             "title": "Максимальный расход газа",
-            "value": daily_report.max_gas_consumption,
+            "value": daily_report.max_gas_consumption | round(2),
             "ms": "л/мин"
         },
         "max_wire_consumption": {
             "title": "Максимальный расход проволки",
-            "value": daily_report.max_wire_consumption,
+            "value": daily_report.max_wire_consumption | round(2),
             "ms": "кг/час"
         }
     }

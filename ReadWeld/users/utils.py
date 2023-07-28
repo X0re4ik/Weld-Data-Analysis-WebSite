@@ -15,4 +15,3 @@ class MasterLogin(UserMixin):
     
     def get_id(self):
         return str(self.__worker.id)
-    
