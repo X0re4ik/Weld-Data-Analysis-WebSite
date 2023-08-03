@@ -121,10 +121,12 @@ class MasterLoginView(View):
             if master and master.password == form.password.data:
                 master_login = MasterLogin().fromDB(master.worker_id)
                 login_user(master_login, remember=form.remember_me.data)
-                next = request.args.get('next')
-                if not url_has_allowed_host_and_scheme(next, request.host):
-                    return abort(400)
-                return redirect(next or url_for('users.login_master'))
+                return redirect(url_for('users.login_master'))
+                # next = request.args.get('next')
+                # if not url_has_allowed_host_and_scheme(next, request.host):
+                #     return abort(400)
+                # return redirect(next or url_for('users.login_master'))
+            
         return render_template(self.template, form=form, masterID=current_user.get_id())
 
 

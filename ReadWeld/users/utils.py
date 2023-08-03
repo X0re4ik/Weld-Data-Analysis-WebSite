@@ -15,3 +15,8 @@ class MasterLogin(UserMixin):
     
     def get_id(self):
         return str(self.__worker.id)
+    
+    
+@login_manager.user_loader
+def load_user(worker_id):
+    return MasterLogin().fromDB(worker_id=worker_id)
