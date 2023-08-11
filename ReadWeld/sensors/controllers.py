@@ -102,6 +102,7 @@ class SensorEditView(View):
             worker_id=sensor.worker_id,
             welding_wire_diameter_id=sensor.welding_wire_diameter_id,
             weld_metal_id=sensor.weld_metal_id,
+            welding_gas_id=sensor.welding_gas_id,
             
             begining_of_work_day=sensor.begining_of_work_day,
             end_of_working_day=sensor.end_of_working_day

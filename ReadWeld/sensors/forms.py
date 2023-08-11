@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, IntegerField, DateField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, NumberRange
-from ReadWeld.models import Worker, Master, WeldingWireDiameter, WeldMetal, Sensor
+from ReadWeld.models import Worker, Master, WeldingWireDiameter, WeldMetal, Sensor, WeldingGas
 
 
 class SensorForm(FlaskForm):
@@ -37,6 +37,10 @@ class SensorForm(FlaskForm):
     _weld_metals = [(wm.id, f"{wm.density}/{wm.steel_name}") for wm in WeldMetal.query.filter_by().all() ]
     weld_metal_id = SelectField('Металл: ',
                             choices=_weld_metals)
+    
+    _welding_gases = [ (wg.id, wg.name) for wg in WeldingGas.query.filter_by().all() ]
+    welding_gas_id = SelectField('Газ: ',
+                            choices=_welding_gases)
 
     submit = SubmitField('Изменить')
     
