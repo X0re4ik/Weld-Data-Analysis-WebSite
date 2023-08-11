@@ -1,16 +1,13 @@
-from datetime import datetime
-from ReadWeld import db
-from flask_login import UserMixin
-from ReadWeld import login_manager
-
+from sqlalchemy import UniqueConstraint
 from typing import List, Tuple, Dict
 
-    
-    
+
+from datetime import datetime
+from ReadWeld import db
+
 
 class Sensor(db.Model):
     __tablename__ = "sensor"
-    
     
     id = db.Column(db.Integer, primary_key=True)
     mac_address = db.Column(db.String(30), unique=True, nullable=False)
@@ -25,6 +22,7 @@ class Sensor(db.Model):
     worker_id = db.Column(db.Integer, db.ForeignKey('worker.id'), nullable=True)
     welding_wire_diameter_id = db.Column(db.Integer, db.ForeignKey('welding_wire_diameter.id'), nullable=False, default=1)
     weld_metal_id = db.Column(db.Integer, db.ForeignKey('weld_metal.id'), nullable=False, default=1)
+    welding_gas_id = db.Column(db.Integer, db.ForeignKey('welding_gas.id'), nullable=False, default=1)
     
     daily_reports = db.relationship('DailyReport', backref='Sensor', lazy='dynamic')
 
@@ -143,17 +141,6 @@ class Welder(db.Model):
             "category": self.category
         }
     
-    
-class Admin(db.Model, UserMixin):
-    __tablename__ = "admin"
-    
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(15), unique=True, nullable=False)
-    password = db.Column(db.String(15), unique=True, nullable=False)
-    
-@login_manager.user_loader
-def load_user(admin_id: int):
-    return Admin.query.get(admin_id)
 
     
     
@@ -197,8 +184,7 @@ class WeldMetal(db.Model):
     @staticmethod
     def get_id_of_metal(steel_name: str):
         return WeldMetal.query.filter_by(steel_name=steel_name).first()
-    
-        
+
 
 
 class Measurement(db.Model):
@@ -226,8 +212,7 @@ class Measurement(db.Model):
         }
     
 
-    
-from sqlalchemy import UniqueConstraint
+
 
 class DailyReport(db.Model):
     __tablename__ = "daily_report"
@@ -340,6 +325,11 @@ class DailyReport(db.Model):
         return answer
 
 
+class WeldingGas(db.Model):
+    __tablename__ = "welding_gas"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    
 
 class InitDataBase:
     def __init__(self):
@@ -352,14 +342,11 @@ class InitDataBase:
             ("Сталь", 7700), ("Медь", 8.93*10**3)
         ]
         
+        self.welding_gases = [
+            "Аргон", "Углекислота"
+        ]
+        
         self.fill_in_tables_if_there_is_no_data()
-    
-    def fill_table__Admin(self):
-        self.add_and_commit_in_db(Admin(
-            username="SuperUser",
-            password="SuperUser"
-        ))
-        return self
         
     def fill_table__WeldingWireDiameter(self):
         for standard_welding_wire_diameter in self.standard_welding_wire_diameters:
@@ -372,6 +359,11 @@ class InitDataBase:
             weld_metal = WeldMetal(steel_name=steel_name, density=density)
             self.add_and_commit_in_db(weld_metal)
         return self
+
+    def fill_table__WeldingGas(self):
+        for welding_gas in self.welding_gases:
+            self.add_and_commit_in_db(WeldingGas(name=welding_gas))
+        return self
     
     
     
@@ -383,12 +375,10 @@ class InitDataBase:
 
         if not WeldingWireDiameter.query.filter_by().first():
             self.fill_table__WeldingWireDiameter()
-
-        if not Admin.query.filter_by().first():
-            self.fill_table__Admin()
         
+        if not WeldingGas.query.filter_by().first():
+            self.fill_table__WeldingGas()
         
-           
         
     @staticmethod
     def add_and_commit_in_db(row) -> int:

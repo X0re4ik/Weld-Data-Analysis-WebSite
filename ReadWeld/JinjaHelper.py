@@ -81,7 +81,6 @@ class JinjaHelper:
     @staticmethod
     def about_sensor(sensor: dict):
         keys = ["mac", "name", "worker", "href", "cheats"]
-        
         is_valid = sensor and len(sensor) != 0
         if not is_valid: return None
         
