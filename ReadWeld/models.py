@@ -6,6 +6,13 @@ from datetime import datetime
 from ReadWeld import db
 
 
+
+# class TemplateModel(db.Model):
+    
+#     def as_dict(self, deep=True):
+#         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
 class Sensor(db.Model):
     __tablename__ = "sensor"
     
@@ -240,6 +247,8 @@ class DailyReport(db.Model):
     worker_id = db.Column(db.Integer, db.ForeignKey('worker.id'), nullable=True)
     welding_wire_diameter_id = db.Column(db.Integer, db.ForeignKey('welding_wire_diameter.id'), nullable=False)
     weld_metal_id = db.Column(db.Integer, db.ForeignKey('weld_metal.id'), nullable=False)
+    welding_gas_id = db.Column(db.Integer, db.ForeignKey('welding_gas.id'), nullable=False)
+    
     
     # Время работы, простоя
     running_time_in_seconds = db.Column(db.Integer, nullable=False)
@@ -259,6 +268,9 @@ class DailyReport(db.Model):
     
     def get_WeldMetal(self):
         return WeldMetal.query.filter_by(id=self.weld_metal_id).first()
+    
+    def get_WeldingGas(self):
+        return WeldingGas.query.filter_by(id=self.welding_gas_id).first()
     
     @staticmethod
     def get_template():
@@ -306,16 +318,20 @@ class DailyReport(db.Model):
             'worker': self.get_Worker(),
             'welding_wire_diameter': self.get_WeldingWireDiameter(),
             "weld_metal": self.get_WeldMetal(),
+            "welding_gas": self.get_WeldingGas(),
             
             'running_time_in_seconds': self.running_time_in_seconds,
             'idle_time_in_seconds': self.idle_time_in_seconds
         }
+        
         if deep:
             value_or_null = lambda value: value.to_dict() if value else None
             answer["worker"] = value_or_null(answer["worker"])
             answer["welding_wire_diameter"] = value_or_null(answer["welding_wire_diameter"])
             answer["sensor"] = value_or_null(answer["sensor"])
             answer["weld_metal"] = value_or_null(answer["weld_metal"])
+            answer["welding_gas"] = value_or_null(answer["welding_gas"])
+            
             answer["date"] = {
                 "year": self.date.year,
                 "month": self.date.month,
@@ -329,6 +345,9 @@ class WeldingGas(db.Model):
     __tablename__ = "welding_gas"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
+    
+    def to_dict(self, deep=True):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
     
 
 class InitDataBase:

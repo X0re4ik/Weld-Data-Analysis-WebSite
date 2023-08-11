@@ -139,7 +139,6 @@ class _StatisticsView(View, ABC):
             ("sensors", "statistics", title)
         )
         
-        self.__redirect_if_error = "not_found_error"
         self._statistics = None
     
     def __later_init__(self, mac_address: str):
