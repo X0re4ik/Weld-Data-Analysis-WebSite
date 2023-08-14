@@ -11,6 +11,7 @@ db = SQLAlchemy()
 
 from ReadWeld.models import *
 from ReadWeld.JinjaHelper import JinjaHelper
+from ReadWeld.utils import *
 
 from flask import render_template
 def create_app():

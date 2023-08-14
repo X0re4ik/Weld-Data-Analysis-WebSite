@@ -6,11 +6,14 @@ from flask_login import (
 from flask.views import View
 
 
-from ReadWeld.api import api
+from ReadWeld.utils import r_if_sensor_not_exist
+
 
 class DownloadFileAPI(View):
     
-    methods = ['POST', 'GET']
+    methods = ['GET']
+    
+    decorators = [r_if_sensor_not_exist, login_required]
     
     PATH_TO_DB_WITH_FILES = r"C:\Users\Ferre\OneDrive\Документы\Xore4ik\ZIT-ReadWeld\db\sensors"
     

@@ -1,5 +1,6 @@
 from datetime import datetime
 from abc import ABC
+from pathlib import Path
 
 from flask import render_template, url_for, redirect, request
 from flask_login import (
@@ -16,9 +17,7 @@ from ReadWeld.sensors.utils import (
     DailyStatistics,
     NotFindRWSensorException
 )
-
-
-from ReadWeld.sensors import sensors
+from ReadWeld.utils import r_if_sensor_not_exist
 
 
     
@@ -83,7 +82,7 @@ class SensorEditView(View):
     
     methods=['POST', "GET"]
     
-    decorators = [login_required]
+    decorators = [r_if_sensor_not_exist, login_required]
     
     def __init__(self) -> None:
         self.template = "/".join(
@@ -247,41 +246,47 @@ class DailyStatisticsView(_StatisticsView):
         }
 
 
-from pathlib import Path
-import os
+
+
 
 class ShowFilesView(View):
     
     methods = ["GET"]
     
-    decorators = [] #[login_required]
+    decorators = [r_if_sensor_not_exist, login_required]
 
     PATH_TO_DB_WITH_FILES = r"C:\Users\Ferre\OneDrive\Документы\Xore4ik\ZIT-ReadWeld\db\sensors"
     
     SUPPORTED_FORMATS = ['xlsx']
     
+    def __init__(self) -> None:
+        super().__init__()
+        
+        self._template = "/".join(
+            ("sensors", "statistics", "files.html")
+        )
+    
     
     def dispatch_request(self, mac_address: str):
-        # sensor = Sensor.query.filter(Sensor.mac_address==mac_address).first()
-        # if not sensor:
-        #     raise RuntimeError("Неизвестный датчик")
         
         PATH_TO_DIR = Path(self.__class__.PATH_TO_DB_WITH_FILES).joinpath(mac_address)
         
         files = []
         
-
-        for PATH_TO_FILE in PATH_TO_DIR.iterdir():
-            SUFFIX = PATH_TO_FILE.suffix[1:]
-            if SUFFIX in self.__class__.SUPPORTED_FORMATS:
-                DATE_STR = PATH_TO_FILE.name.split('.')[0]
-                files.append(
-                    {
-                        "date": DATE_STR,
-                        SUFFIX: PATH_TO_FILE.name
-                    }
-                )
+        if PATH_TO_DIR.exists():
+            for PATH_TO_FILE in PATH_TO_DIR.iterdir():
+                SUFFIX = PATH_TO_FILE.suffix[1:]
+                if SUFFIX in self.__class__.SUPPORTED_FORMATS:
+                    DATE_STR = PATH_TO_FILE.name.split('.')[0]
+                    files.append(
+                        {
+                            "date": DATE_STR,
+                            SUFFIX: PATH_TO_FILE.name
+                        }
+                    )
         
-        return {
-                "s": files
-            }
+        return render_template(
+            self._template,
+            mac_address=mac_address,
+            files=files,
+            masterID=current_user.get_id())

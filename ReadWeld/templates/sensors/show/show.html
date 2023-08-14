@@ -19,6 +19,7 @@
             {{ show_options("Металл", object.weld_metal.steel_name) }}
             <a class="worker_edit" href={{ url_for('sensors.edit_settings', mac_address=__sensor.mac_address) }}>Редактировать</a>
             <a class="worker_edit" href="{{ url_for('sensors.weekly-statistics-view', mac_address=__sensor.mac_address, year=[year], number_of_week=[number_of_week], interval=[15])}}">Статистика</a>
+            <a class="worker_edit" href="{{ url_for('sensors.show-files-view', mac_address=__sensor.mac_address)}}">Кладовка</a>
         {% endcall %}
     {% endfor %}
 {% endblock %}
