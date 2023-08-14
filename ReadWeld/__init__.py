@@ -34,10 +34,15 @@ def create_app():
     from ReadWeld.sensors.routes import sensors
     app.register_blueprint(sensors)
     
+    from ReadWeld.api.routes import api
+    app.register_blueprint(api)
+
+    
     return app
 
 
 app = create_app()
+
 
 from werkzeug.exceptions import HTTPException
 
