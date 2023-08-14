@@ -41,6 +41,8 @@ app = create_app()
 
 from werkzeug.exceptions import HTTPException
 
+
+
 # @app.errorhandler(404)
 # def not_found_error(error):
 #     return render_template('error.html', error_description=error, error_code=404), 404

@@ -7,13 +7,13 @@ from ReadWeld import db
 
 
 
-# class TemplateModel(db.Model):
+class ModelAsDict:
     
-#     def as_dict(self, deep=True):
-#         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+    def as_dict(self, deep=True):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
-class Sensor(db.Model):
+class Sensor(db.Model, ModelAsDict):
     __tablename__ = "sensor"
     
     id = db.Column(db.Integer, primary_key=True)
