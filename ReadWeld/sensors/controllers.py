@@ -245,3 +245,43 @@ class DailyStatisticsView(_StatisticsView):
                 "length": len(measurements)
             }
         }
+
+
+from pathlib import Path
+import os
+
+class ShowFilesView(View):
+    
+    methods = ["GET"]
+    
+    decorators = [] #[login_required]
+
+    PATH_TO_DB_WITH_FILES = r"C:\Users\Ferre\OneDrive\Документы\Xore4ik\ZIT-ReadWeld\db\sensors"
+    
+    SUPPORTED_FORMATS = ['xlsx']
+    
+    
+    def dispatch_request(self, mac_address: str):
+        # sensor = Sensor.query.filter(Sensor.mac_address==mac_address).first()
+        # if not sensor:
+        #     raise RuntimeError("Неизвестный датчик")
+        
+        PATH_TO_DIR = Path(self.__class__.PATH_TO_DB_WITH_FILES).joinpath(mac_address)
+        
+        files = []
+        
+
+        for PATH_TO_FILE in PATH_TO_DIR.iterdir():
+            SUFFIX = PATH_TO_FILE.suffix[1:]
+            if SUFFIX in self.__class__.SUPPORTED_FORMATS:
+                DATE_STR = PATH_TO_FILE.name.split('.')[0]
+                files.append(
+                    {
+                        "date": DATE_STR,
+                        SUFFIX: PATH_TO_FILE.name
+                    }
+                )
+        
+        return {
+                "s": files
+            }

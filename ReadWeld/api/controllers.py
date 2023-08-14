@@ -22,32 +22,25 @@ from ReadWeld.api import api
 
 
     
-# class ShowSensorsView(View):
-#     """
-#         Класс отображение всех ReadWeld-датчиков
-#             methods: 'GET'
-#     """
+class DownloadFileAPI(View):
     
-#     methods=['GET']
-#     decorators = [login_required]
     
-#     def __init__(self) -> None:
-#         super().__init__()
-#         self.template = "/".join(
-#             ("sensors", "show", "show.html")
-#         )
+    methods = ['POST']
     
-#     def dispatch_request(self):
-#         __sensors = Sensor.query.filter_by().all()
-#         performances = [list(sensor.calculate_performance()) for sensor in __sensors]
-#         _sensors = [sensor.to_dict() for sensor in __sensors]
+    PATH_TO_DB_WITH_FILES = r"C:\Users\Ferre\OneDrive\Документы\Xore4ik\ZIT-ReadWeld\db\sensors"
+    
+    
+    def dispatch_request(self):
+        __sensors = Sensor.query.filter_by().all()
+        performances = [list(sensor.calculate_performance()) for sensor in __sensors]
+        _sensors = [sensor.to_dict() for sensor in __sensors]
         
-#         year, number_of_week, day = datetime.today().isocalendar()
+        year, number_of_week, day = datetime.today().isocalendar()
 
-#         return render_template(
-#             self.template,
-#             sensors=_sensors,
-#             performances=performances,
-#             year=year, number_of_week=number_of_week, day=day,
-#             masterID=current_user.get_id()
-#         )
+        return render_template(
+            self.template,
+            sensors=_sensors,
+            performances=performances,
+            year=year, number_of_week=number_of_week, day=day,
+            masterID=current_user.get_id()
+        )

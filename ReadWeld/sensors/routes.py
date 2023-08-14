@@ -5,7 +5,8 @@ from ReadWeld.sensors.controllers import (
     WeeklyStatisticsView,
     ShowSensorsView,
     SelectIntervalForDisplayingStatisticsView,
-    SensorEditView
+    SensorEditView,
+    ShowFilesView
 )
 
 sensors.add_url_rule("/sensors/show", 
@@ -17,9 +18,12 @@ sensors.add_url_rule("/sensors/<string:mac_address>/edit",
 sensors.add_url_rule("/sensors/statistics", 
                      view_func=SelectIntervalForDisplayingStatisticsView.as_view("statistics"))
 
-sensors.add_url_rule("/sensors/statistics/<string:mac_address>//daily", 
+sensors.add_url_rule("/sensors/statistics/<string:mac_address>/daily", 
                      view_func=DailyStatisticsView.as_view("daily-statistics-view"))
 
 sensors.add_url_rule("/sensors/statistics/<string:mac_address>/weekly", 
                      view_func=WeeklyStatisticsView.as_view("weekly-statistics-view"))
 
+
+sensors.add_url_rule("/sensors/statistics/<string:mac_address>/files",
+                     view_func=ShowFilesView.as_view("show-files-view"))
