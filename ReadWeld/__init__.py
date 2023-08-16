@@ -52,7 +52,7 @@ class AppCreator:
         return self
     
     def include_other(self):
-        from ReadWeld.JinjaHelper import JinjaHelper
+        from ReadWeld.utils import JinjaHelper
         JinjaHelper.load(self.__class__.app)
         return self
     
