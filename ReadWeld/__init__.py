@@ -6,21 +6,18 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
-import os
-from dotenv import load_dotenv
+
 from ReadWeld.utils import envNotFound
 
-DOTENV_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
-if os.path.exists(DOTENV_PATH): load_dotenv(DOTENV_PATH)
-else: raise envNotFound(DOTENV_PATH)
 
+import ReadWeld.config as config 
 
 from flask import Flask
 class AppCreator:
     
     app = Flask(__name__)
     
-    PATH_TO_DB_WITH_FILES: str = os.getenv("PATH_TO_DB_WITH_FILES")
+    PATH_TO_DB_WITH_FILES: str = config.PATH_TO_DB_WITH_FILES
     
     def include_config(self):
         from ReadWeld.config import Config, TestConfig

@@ -21,7 +21,7 @@ class Sensor(db.Model, ModelAsDict):
         
     device_name = db.Column(db.String(30), nullable=False, default="ReadWeld#...")
     location = db.Column(db.String(150), nullable=True)
-    measurement_period = db.Column(db.Integer, max_value=10, min_value=1, default=1)
+    measurement_period = db.Column(db.Integer, default=1)
     
     begining_of_work_day = db.Column(db.Integer, nullable=False, default=6)
     end_of_working_day = db.Column(db.Integer, nullable=False, default=18)
