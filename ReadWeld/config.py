@@ -1,12 +1,18 @@
+import os
+
+
+DATA_BASE_USERNAME  = os.getenv("DATA_BASE_USERNAME")
+DATA_BASE_PASSWORD  = os.getenv("DATA_BASE_PASSWORD")
+DATA_BASE_HOST      = os.getenv("DATA_BASE_HOST")
+DATA_BASE_PORT      = os.getenv("DATA_BASE_PORT")
+DATA_BASE_NAME      = os.getenv("DATA_BASE_NAME")
+
+FLASK_SECRET_KEY    = os.getenv("FLASK_SECRET_KEY")
+
+
 class Config:
-    #SQLALCHEMY_DATABASE_URI = "postgresql://postgres:Xore4ik55@127.0.0.1:5432/ReadWeldTest"
-    #"postgresql://postgres:password@localhost:5433/fastapi"
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:Xore4ik55@localhost:5433/ReadWeldTest"
+    SQLALCHEMY_DATABASE_URI = f"postgresql://{DATA_BASE_USERNAME}:{DATA_BASE_PASSWORD}@{DATA_BASE_HOST}:{DATA_BASE_PORT}/{DATA_BASE_NAME}"
     SECRET_KEY = '5791628bb0b13ce0c676dfde280ba245'
-    #SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-
-
 
 class TestConfig(Config):
     SQLALCHEMY_ECHO = True

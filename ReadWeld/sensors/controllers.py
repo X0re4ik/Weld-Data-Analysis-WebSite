@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from abc import ABC
 from pathlib import Path
@@ -19,7 +20,7 @@ from ReadWeld.sensors.utils import (
 )
 from ReadWeld.utils import r_if_sensor_not_exist
 
-
+PATH_TO_DB_WITH_SENSORS_FILES = Path(os.getenv("PATH_TO_DB_WITH_FILES")).joinpath("sensors")
     
 class ShowSensorsView(View):
     """
@@ -255,7 +256,7 @@ class ShowFilesView(View):
     
     decorators = [r_if_sensor_not_exist, login_required]
 
-    PATH_TO_DB_WITH_FILES = r"C:\Users\Ferre\OneDrive\Документы\Xore4ik\ZIT-ReadWeld\db\sensors"
+    PATH_TO_DB_WITH_SENSORS_FILES: str
     
     SUPPORTED_FORMATS = ['xlsx']
     
@@ -269,7 +270,7 @@ class ShowFilesView(View):
     
     def dispatch_request(self, mac_address: str):
         
-        PATH_TO_DIR = Path(self.__class__.PATH_TO_DB_WITH_FILES).joinpath(mac_address)
+        PATH_TO_DIR = Path(self.__class__.PATH_TO_DB_WITH_SENSORS_FILES).joinpath(mac_address)
         
         files = []
         
@@ -290,3 +291,5 @@ class ShowFilesView(View):
             mac_address=mac_address,
             files=files,
             masterID=current_user.get_id())
+
+ShowFilesView.PATH_TO_DB_WITH_SENSORS_FILES = PATH_TO_DB_WITH_SENSORS_FILES

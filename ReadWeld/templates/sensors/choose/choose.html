@@ -4,7 +4,7 @@
 {% set sensors = sensors %}
 {% block main_content %}
     <h1 class="title2">Выпрать период статистики</h1>
-    <form id="add">
+    <form id="add" active='#'>
         <label for="choose-week">Выберете неделю</label>
         <input type="week" name="choose-week" id="choose-week" min="2023-W1" max="2030-W1" value="">
         
@@ -67,7 +67,8 @@
                 
                 urlNewPage.searchParams.set("interval", 15);
             }
-            if (weekValue || dayValue) window.open(urlNewPage.href)
+            console.log(urlNewPage.href)
+            //if (weekValue || dayValue) window.open(urlNewPage.href)
         }
     </script>
 
