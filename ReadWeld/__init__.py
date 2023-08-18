@@ -1,3 +1,7 @@
+
+
+
+
 from flask_login import LoginManager
 login_manager = LoginManager()
 login_manager.login_view = 'users.login_master'
@@ -7,17 +11,15 @@ db = SQLAlchemy()
 
 
 
-from ReadWeld.utils import envNotFound
 
-
-import ReadWeld.config as config 
+from ReadWeld.config import PATH_TO_DB_WITH_FILES 
 
 from flask import Flask
 class AppCreator:
     
     app = Flask(__name__)
     
-    PATH_TO_DB_WITH_FILES: str = config.PATH_TO_DB_WITH_FILES
+    PATH_TO_DB_WITH_FILES: str = PATH_TO_DB_WITH_FILES
     
     def include_config(self):
         from ReadWeld.config import Config, TestConfig
@@ -36,11 +38,13 @@ class AppCreator:
         return self
     
     def include_context(self):
+        
+        
         self.__class__.app.app_context().push()
         with self.__class__.app.app_context():
-            from ReadWeld.models import InitDataBase
-            InitDataBase()
             db.create_all()
+        from ReadWeld.models import InitDataBase
+        InitDataBase()
         return self
         
     def init_apps(self):

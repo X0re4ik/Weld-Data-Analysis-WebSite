@@ -383,6 +383,11 @@ class InitDataBase:
         for welding_gas in self.welding_gases:
             self.add_and_commit_in_db(WeldingGas(name=welding_gas))
         return self
+
+    def fill_table__Master(self):
+        worker_id = self.add_and_commit_in_db(Worker(first_name="Anton", second_name="Mochalov", phone=""))
+        master_id = self.add_and_commit_in_db(Master(email="ZIT@yandex.ru", password="ZIT", notification=False, worker_id=worker_id))
+        return self
     
     
     
@@ -397,6 +402,9 @@ class InitDataBase:
         
         if not WeldingGas.query.filter_by().first():
             self.fill_table__WeldingGas()
+        
+        if not Master.query.filter_by().first():
+            self.fill_table__Master()
         
         
     @staticmethod

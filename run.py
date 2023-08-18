@@ -1,15 +1,11 @@
 import os
 from dotenv import load_dotenv
-import os
-print(os.listdir("./"))
 
-DOTENV_PATH = os.path.join(os.path.dirname(os.path.abspath(os.path.dirname(__file__))), ".env")
-print(DOTENV_PATH)
+DOTENV_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), ".web.env")
 if os.path.exists(DOTENV_PATH):
     load_dotenv(DOTENV_PATH)
-else: 
-    raise FileNotFoundError(
-f"""
+else:
+    raise FileNotFoundError(f"""
     Cруктура проекта должна быть следующая:
         |-<папка web сервиса>
             |-ReadWeld
@@ -40,10 +36,13 @@ f"""
 
     При запуске, приложение искало env в директории:
         {DOTENV_PATH}
+    
+    Текщая директория:
+        {os.path.abspath(__file__)}
 """)
 
 from ReadWeld import app
-from ReadWeld.config import *
+from ReadWeld.config import APP_HOST, APP_PORT, APP_DEBUG
 
 
 if __name__ == '__main__':

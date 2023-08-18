@@ -11,30 +11,38 @@ from ReadWeld.models import (
 
 class NotFindRWSensorException(Exception):
     def __init__(self, mac_address) -> None:
-        self.__mac_address = mac_address
-        self.message = f"RW устройство с MAC адрессом {self.__mac_address} не найдено"
+        self._message = f"RW устройство с MAC адрессом {mac_address} не найдено"
+        super().__init__(self._message)
+        
         
 class LackOfStatisticsForPeriodException(Exception):
     def __init__(self, start, end) -> None:
-        self.start = start
-        self.end = end
-        self.message = f"За данный период (c {self.start} по {self.end}) отсутсвует какая-либо статистика"
-        super().__init__(self.message)
+        self._message = f"За данный период (c {start} по {end}) отсутсвует какая-либо статистика"
+        super().__init__(self._message)
 
 
-    
 class __Statistics:
     def __init__(self, mac_address: str, start: datetime, end: datetime) -> None:
         self.sensor = Sensor.query.filter_by(mac_address=mac_address).first()
-        if not self.sensor: raise NotFindRWSensorException(mac_address)
-        self.start  = start
-        self.end    = end
+        self.start: datetime  = start
+        self.end:   datetime    = end
         
         self.daily_reports = self.distribution_entries_by_day_of_week()
         if (len(self.daily_reports) == 0) or not (True in [daily_report != None for daily_report in self.daily_reports]):
             raise LackOfStatisticsForPeriodException(self.start, self.end)
 
-    
+    @staticmethod
+    def are_there_daily_reports_for_period(mac_address: str, start: datetime, end: datetime) -> bool:
+        sensor_ = Sensor.query.filter(Sensor.mac_address == mac_address).first()
+        
+        for days in range((end - start).days + 1):
+            date = start + timedelta(days=days)
+            daily_report = DailyReport.query.filter_by(
+                sensor_id=sensor_.id,
+                date=date).first()
+            if daily_report: return True
+        return False
+        
     def distribution_entries_by_day_of_week(self):
         records = []
         for i in range((self.end - self.start).days + 1):
@@ -46,7 +54,6 @@ class __Statistics:
             records.append(daily_report)
         return records
         
-
     def calculation_of_spent_wire_and_gas(self):
         expended_wire = 0
         expended_gas = 0
@@ -56,7 +63,6 @@ class __Statistics:
                 expended_gas += daily_report.expended_gas
         return (expended_wire, expended_gas)
 
-    
     def calculation_work_and_idle_time(self) -> Tuple:
         work_time = 0
         idle_time = 0

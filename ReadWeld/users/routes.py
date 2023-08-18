@@ -6,6 +6,7 @@ from ReadWeld.users.controllers import (
     MasterEditView
 )
 
+
 users.add_url_rule("/users/welder/add", 
                      view_func=WelderAddView.as_view("add_welder"))
 
@@ -29,10 +30,6 @@ from flask import redirect, url_for
 def logout():
     logout_user()
     return redirect(url_for("users.login_master"))
-
-
-from flask_login import logout_user
-from flask import redirect, url_for
 
 @users.route("/", methods=["POST", "GET"])
 def start():

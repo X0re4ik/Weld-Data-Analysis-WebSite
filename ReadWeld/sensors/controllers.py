@@ -92,7 +92,6 @@ class SensorEditView(View):
         
     def dispatch_request(self, mac_address: str):
         sensor = Sensor.query.filter_by(mac_address=mac_address).first()
-        if not sensor: raise NotFindRWSensorException(mac_address)
         
         form = SensorForm(
             device_name=sensor.device_name,
@@ -130,7 +129,7 @@ class _StatisticsView(View, ABC):
     
     methods = ["GET"]
     
-    decorators = [login_required]
+    decorators = [login_required, r_if_sensor_not_exist]
     
     def __init__(self, _type) -> None:
         title = "weekly" if _type == "w" else "daily"
@@ -141,9 +140,12 @@ class _StatisticsView(View, ABC):
         
         self._statistics = None
     
-    def __later_init__(self, mac_address: str):
-        self._sensor = Sensor.query.filter_by(mac_address=mac_address).first()
-        if not self._sensor: raise NotFindRWSensorException(mac_address)
+    
+    def _setStatistics(self, statistics):
+        self._statistics = statistics
+
+    def _setRequestParameters(*args, **kwargs):
+        pass
         
 
     def data_to_dict(self):
@@ -165,7 +167,6 @@ class _StatisticsView(View, ABC):
         
     def dispatch_request(self, mac_address: str):
         self.__later_init__(mac_address)
-        
         statistics = self.data_to_dict()
         return render_template(self.template, statistics=statistics, masterID=current_user.get_id())
 
@@ -182,17 +183,11 @@ class WeeklyStatisticsView(_StatisticsView):
     
     def __init__(self) -> None:
         super().__init__('w')
-
-    
-    def __later_init__(self, mac_address):
-        super().__later_init__(mac_address)
         
-        self.year            = int(request.args.get("year"))
-        self.number_of_week  = int(request.args.get("number_of_week"))
-        
-        self._statistics = WeeklyStatistics(
-            mac_address, self.year, self.number_of_week
-        )
+    def __later_init__(self, mac_address):       
+        year            = int(request.args.get("year"))
+        number_of_week  = int(request.args.get("number_of_week"))
+        self._statistics = WeeklyStatistics(mac_address, year, number_of_week)
     
     def data_to_dict(self):
         general_data = super().data_to_dict()
@@ -224,14 +219,13 @@ class DailyStatisticsView(_StatisticsView):
     
     
     def __later_init__(self, mac_address):
-        super().__later_init__(mac_address)
         
-        self.year            = int(request.args.get("year"))
-        self.month           = int(request.args.get("month"))
-        self.day             = int(request.args.get("day"))
+        year            = int(request.args.get("year"))
+        month           = int(request.args.get("month"))
+        day             = int(request.args.get("day"))
         self.interval        = int(request.args.get("interval") or 15)
         
-        self._statistics = DailyStatistics(mac_address, self.year, self.month, self.day)
+        self._statistics = DailyStatistics(mac_address, year, month, day)
     
     def data_to_dict(self):
         general_data = super().data_to_dict()
@@ -253,12 +247,11 @@ class DailyStatisticsView(_StatisticsView):
 class ShowFilesView(View):
     
     methods = ["GET"]
-    
     decorators = [r_if_sensor_not_exist, login_required]
-
-    PATH_TO_DB_WITH_SENSORS_FILES: str
     
     SUPPORTED_FORMATS = ['xlsx']
+
+    PATH_TO_DB_WITH_SENSORS_FILES: str
     
     def __init__(self) -> None:
         super().__init__()

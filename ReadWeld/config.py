@@ -9,19 +9,13 @@ APP_PORT                        = int(os.getenv("APP_PORT"))
 APP_DEBUG                       = bool(os.getenv("APP_DEBUG"))
 
 # Настройки базы данных
-DATA_BASE_TITLE                 = os.getenv("DATA_BASE_TITLE")
-DATA_BASE_USERNAME              = os.getenv("DATA_BASE_USERNAME")
-DATA_BASE_PASSWORD              = os.getenv("DATA_BASE_PASSWORD")
-DATA_BASE_HOST                  = os.getenv("DATA_BASE_HOST")
-DATA_BASE_PORT                  = os.getenv("DATA_BASE_PORT")
-DATA_BASE_NAME                  = os.getenv("DATA_BASE_NAME")
+DB_URI                          = os.getenv("DB_URI")
 
 #Прочие настройки
 PATH_TO_DB_WITH_FILES           = os.getenv("PATH_TO_DB_WITH_FILES")
 
-
 class Config:
-    SQLALCHEMY_DATABASE_URI = f"{DATA_BASE_TITLE}://{DATA_BASE_USERNAME}:{DATA_BASE_PASSWORD}@{DATA_BASE_HOST}:{DATA_BASE_PORT}/{DATA_BASE_NAME}"
+    SQLALCHEMY_DATABASE_URI = DB_URI
     SECRET_KEY = FLASK_SECRET_KEY
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
