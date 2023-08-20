@@ -94,16 +94,18 @@ class AppCreator:
                 
         
 app = AppCreator.get_app()
-        
+
+
 
 
 from werkzeug.exceptions import HTTPException
 
 
+from flask import render_template
 
-# @app.errorhandler(404)
-# def not_found_error(error):
-#     return render_template('error.html', error_description=error, error_code=404), 404
+@app.errorhandler(404)
+def not_found_error(error_content):
+    return render_template('404.html', error_content=error_content)
 
 
 # @app.errorhandler(Exception)

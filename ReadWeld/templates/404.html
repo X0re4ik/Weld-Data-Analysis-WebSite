@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+
+{% block main_content %}
+    <div class="error">
+        <div class="error_headline">
+            <div class="error_face">
+                <img src="/static/img/base/sad.svg" alt="Грустный эмодзи">
+            </div>
+            <article>
+                <h1>Упс, что-то пошло не так..</h1>
+                <h2>{{ error_content }}</h2>
+            </article>
+        </div>
+        <div class="error_text">
+            <p>
+                <span>Ваши данные сохранились?</span>
+                В таком случае вернитесь <a onclick="javascript:history.back(); return false;">на&nbsp;предыдущую&nbsp;страницу</a> и&nbsp;сервис автоматически возобновновит работу.
+            </p>
+
+            <p>
+                <span>Ваши данные утеряны?</span>
+                Обратитесь в <a href="">Службу поддержки</a>
+            </p>
+        </div>
+    </div>
+{% endblock %}
+
+
