@@ -64,6 +64,34 @@ class ErrorIfNotExsist:
 
 
 
+from typing import Optional
+from pathlib import Path
+
+from ReadWeld import READ_WELD_WORKDIR
+
+
+
+class WorkingWithFileDatabase:
+    
+    NAME: Optional[str] = None
+    FILE_DATABASE: Optional[Path] = None
+    DIRS = ["sensors", "users"]
+    
+    def __init__(self) -> None:
+        if self.__class__.NAME is None:
+            raise ValueError("NAME не определен")
+
+        self.__class__.FILE_DATABASE = Path.joinpath(READ_WELD_WORKDIR.parent.absolute(), self.__class__.NAME)
+        for dir in self.__class__.DIRS:
+            path_to = Path.joinpath(self.__class__.FILE_DATABASE, dir)
+            path_to.mkdir(exist_ok=True)
+            setattr(self, f"PATH_TO_FILES_WITH_{dir.upper()}", path_to)
+        
+    
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(WorkingWithFileDatabase, cls).__new__(cls)
+        return cls.instance
 
 
 
@@ -76,10 +104,28 @@ from ReadWeld.models import Master, Worker
 from flask import url_for
 class JinjaHelper:
     
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(JinjaHelper, cls).__new__(cls)
+        return cls.instance
+    
     
     @staticmethod
     def python_object_to_json(__object):
         return json.dumps(__object)
+    
+    @staticmethod
+    def init_app(app):
+        app.jinja_env.globals.update(
+            python_object_to_json=JinjaHelper.python_object_to_json)
+        app.jinja_env.globals.update(working_hours=JinjaHelper.working_hours)
+        app.jinja_env.globals.update(date_on_day_of_week=JinjaHelper.date_on_day_of_week)
+        app.jinja_env.globals.update(worker=JinjaHelper.worker)
+        app.jinja_env.globals.update(sensor_info=JinjaHelper.sensor_info)
+        
+        app.jinja_env.globals.update(about_sensor=JinjaHelper.about_sensor)
+        app.jinja_env.globals.update(about_worker=JinjaHelper.about_worker)
+        app.jinja_env.globals.update(about_master=JinjaHelper.about_master)
 
     @staticmethod
     def load(app):
@@ -180,4 +226,4 @@ class JinjaHelper:
         return dict(zip(keys, values))
         
         
-        
+jinja_helper = JinjaHelper()       

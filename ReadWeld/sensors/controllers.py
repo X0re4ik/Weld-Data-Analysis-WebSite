@@ -19,8 +19,6 @@ from ReadWeld.sensors.utils import (
     NotFindRWSensorException
 )
 from ReadWeld.utils import if_sensor_not_exist_404
-
-PATH_TO_DB_WITH_SENSORS_FILES = Path(os.getenv("PATH_TO_DB_WITH_FILES")).joinpath("sensors")
     
 class ShowSensorsView(View):
     """
@@ -251,15 +249,15 @@ class DailyStatisticsView(_StatisticsView):
 
 
 
+from typing import Optional, List
+from ReadWeld.utils import WorkingWithFileDatabase
 
-class ShowFilesView(View):
+class ShowFilesView(View, WorkingWithFileDatabase):
     
     methods = ["GET"]
-    decorators = [if_sensor_not_exist_404, login_required]
+    decorators = [login_required, if_sensor_not_exist_404]
     
-    SUPPORTED_FORMATS = ['xlsx']
-
-    PATH_TO_DB_WITH_SENSORS_FILES: str
+    SUPPORTED_FORMATS: List = ['xlsx']
     
     def __init__(self) -> None:
         super().__init__()
@@ -267,30 +265,25 @@ class ShowFilesView(View):
         self._template = "/".join(
             ("sensors", "statistics", "files.html")
         )
-    
-    
+
     def dispatch_request(self, mac_address: str):
         
-        PATH_TO_DIR = Path(self.__class__.PATH_TO_DB_WITH_SENSORS_FILES).joinpath(mac_address)
-        
+        path_to_dir_with_sensor_data = Path(self.PATH_TO_FILES_WITH_SENSORS).joinpath(mac_address)
+        path_to_dir_with_sensor_data.mkdir(exist_ok=True)
         files = []
-        
-        if PATH_TO_DIR.exists():
-            for PATH_TO_FILE in PATH_TO_DIR.iterdir():
-                SUFFIX = PATH_TO_FILE.suffix[1:]
-                if SUFFIX in self.__class__.SUPPORTED_FORMATS:
-                    DATE_STR = PATH_TO_FILE.name.split('.')[0]
-                    files.append(
-                        {
-                            "date": DATE_STR,
-                            SUFFIX: PATH_TO_FILE.name
-                        }
-                    )
+        for path_to_file in path_to_dir_with_sensor_data.iterdir():
+            suffix = path_to_file.suffix[1:]
+            if suffix in self.__class__.SUPPORTED_FORMATS:
+                titile = path_to_file.name.split('.')[0]
+                files.append(
+                    {
+                        "title": titile,
+                        suffix: path_to_file.name
+                    }
+                )
         
         return render_template(
             self._template,
             mac_address=mac_address,
             files=files,
             masterID=current_user.get_id())
-
-ShowFilesView.PATH_TO_DB_WITH_SENSORS_FILES = PATH_TO_DB_WITH_SENSORS_FILES

@@ -129,9 +129,6 @@ class DailyStatistics(_Statistics):
         __start = date(yaer, month, day)
         __end = __start + timedelta(days=1)
         super().__init__(mac_address, __start, __start)
-        
-        
-    
     
     def __get_measurements_for_period(self, start: datetime, end: datetime):
         return Measurement.query.filter(

@@ -12,7 +12,7 @@ APP_DEBUG                       = bool(os.getenv("APP_DEBUG"))
 DB_URI                          = os.getenv("DB_URI")
 
 #Прочие настройки
-PATH_TO_DB_WITH_FILES           = os.getenv("PATH_TO_DB_WITH_FILES")
+NAME_DB_WITH_FILES           = os.getenv("NAME_DB_WITH_FILES")
 
 class Config:
     SQLALCHEMY_DATABASE_URI = DB_URI

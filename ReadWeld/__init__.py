@@ -10,23 +10,41 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
+from pathlib import Path 
+READ_WELD_WORKDIR = Path('.').parent.absolute()
 
 
-from ReadWeld.config import PATH_TO_DB_WITH_FILES 
+from ReadWeld.config import NAME_DB_WITH_FILES 
+from ReadWeld.utils import WorkingWithFileDatabase
+WorkingWithFileDatabase.NAME = NAME_DB_WITH_FILES
+from ReadWeld.utils import jinja_helper
+from ReadWeld.models import InitDataBase
+from ReadWeld.config import Config, TestConfig
 
 from flask import Flask
 class AppCreator:
     
     app = Flask(__name__)
     
-    PATH_TO_DB_WITH_FILES: str = PATH_TO_DB_WITH_FILES
     
-    def include_config(self):
-        from ReadWeld.config import Config, TestConfig
+    def attach_config(self):
         self.__class__.app.config.from_object(Config)
         return self
+
+    def attach_apps(self):
+        db.init_app(self.__class__.app)
+        login_manager.init_app(self.__class__.app)
+        jinja_helper.init_app(self.__class__.app)
+        return self
     
-    def include_blueprints(self):
+    def attach_context(self):
+        self.__class__.app.app_context().push()
+        with self.__class__.app.app_context():
+            db.create_all()
+        InitDataBase()
+        return self
+    
+    def attach_blueprints(self):
         from ReadWeld.users.routes import users
         self.__class__.app.register_blueprint(users)
         
@@ -36,64 +54,24 @@ class AppCreator:
         from ReadWeld.api.routes import api
         self.__class__.app.register_blueprint(api)
         return self
-    
-    def include_context(self):
         
-        
-        self.__class__.app.app_context().push()
-        with self.__class__.app.app_context():
-            db.create_all()
-        from ReadWeld.models import InitDataBase
-        InitDataBase()
-        return self
-        
-    def init_apps(self):
-        db.init_app(self.__class__.app)
-        login_manager.init_app(self.__class__.app)
-        return self
-    
-    def include_other(self):
-        from ReadWeld.utils import JinjaHelper
-        JinjaHelper.load(self.__class__.app)
-        return self
-    
-    def create_pantry(self):
-        self._create_pantry(self.__class__.PATH_TO_DB_WITH_FILES)
-        return self
-
     @staticmethod
-    def _create_pantry(path):
-        from pathlib import Path
-        path_ = Path(path)
-        path_.mkdir(exist_ok=True)
-        
-        needed_dirs = ["sensors"]
-        
-        for needed_dir in needed_dirs:
-            child_dir = path_.joinpath(needed_dir)
-            child_dir.mkdir(exist_ok=True)
-        
-        
-        
-    
-    @staticmethod
-    def get_app():
+    def get():
         """
            Блюпринт только после контекста
         """
-        
-        return AppCreator()             \
-                .include_config()       \
-                .init_apps()            \
-                .include_context()      \
-                .include_blueprints()   \
-                .include_other()        \
-                .create_pantry()        \
-                .app
+        app_creator = AppCreator()
+        for key in AppCreator.__dict__:
+            att = getattr(AppCreator, key)
+            if key.startswith('attach_') and callable(att) and hasattr(att, '__call__'):
+               att(app_creator) 
+            
+        return app_creator.app
         
                 
         
-app = AppCreator.get_app()
+app = AppCreator.get()
+
 
 
 
