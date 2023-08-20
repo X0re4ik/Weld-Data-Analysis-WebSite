@@ -385,7 +385,7 @@ class InitDataBase:
         return self
 
     def fill_table__Master(self):
-        worker_id = self.add_and_commit_in_db(Worker(first_name="Anton", second_name="Mochalov", phone=""))
+        worker_id = self.add_and_commit_in_db(Worker(first_name="Anton", second_name="Mochalov", phone="+79923458625"))
         master_id = self.add_and_commit_in_db(Master(email="ZIT@yandex.ru", password="ZIT", notification=False, worker_id=worker_id))
         return self
     

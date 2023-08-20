@@ -14,34 +14,45 @@ class NotFindRWSensorException(Exception):
         self._message = f"RW устройство с MAC адрессом {mac_address} не найдено"
         super().__init__(self._message)
         
-        
-class LackOfStatisticsForPeriodException(Exception):
-    def __init__(self, start, end) -> None:
-        self._message = f"За данный период (c {start} по {end}) отсутсвует какая-либо статистика"
-        super().__init__(self._message)
 
 
-class __Statistics:
+
+def _number_of_daily_reports_per_period(mac_address: str, start: datetime, end: datetime) -> int:
+    sensor_ = Sensor.query.filter(Sensor.mac_address == mac_address).first()
+    count_daily_reports: int = 0
+    
+    for days in range((end - start).days + 1):
+        date = start + timedelta(days=days)
+        daily_report = DailyReport.query.filter_by(
+            sensor_id=sensor_.id,
+            date=date).first()
+        count_daily_reports = (count_daily_reports + 1) if daily_report else count_daily_reports  
+    return count_daily_reports
+
+
+from flask import request
+from functools import wraps
+from typing import Any
+from flask import abort
+
+def r_if_daily_report_not_exist(func) -> Any:
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        mac_address, start, end = args[1:]
+        if _number_of_daily_reports_per_period(mac_address, start, end) == 0:
+            abort(404, f"За данный период (c {start} по {end}) отсутсвует какая-либо статистика")
+        return func(*args, **kwargs)
+    return wrapper
+
+class _Statistics:
+    
+    @r_if_daily_report_not_exist
     def __init__(self, mac_address: str, start: datetime, end: datetime) -> None:
         self.sensor = Sensor.query.filter_by(mac_address=mac_address).first()
         self.start: datetime  = start
         self.end:   datetime    = end
         
         self.daily_reports = self.distribution_entries_by_day_of_week()
-        if (len(self.daily_reports) == 0) or not (True in [daily_report != None for daily_report in self.daily_reports]):
-            raise LackOfStatisticsForPeriodException(self.start, self.end)
-
-    @staticmethod
-    def are_there_daily_reports_for_period(mac_address: str, start: datetime, end: datetime) -> bool:
-        sensor_ = Sensor.query.filter(Sensor.mac_address == mac_address).first()
-        
-        for days in range((end - start).days + 1):
-            date = start + timedelta(days=days)
-            daily_report = DailyReport.query.filter_by(
-                sensor_id=sensor_.id,
-                date=date).first()
-            if daily_report: return True
-        return False
         
     def distribution_entries_by_day_of_week(self):
         records = []
@@ -89,7 +100,7 @@ class __Statistics:
             answer.append(_in_dict)
         return answer
 
-class WeeklyStatistics(__Statistics):
+class WeeklyStatistics(_Statistics):
     
     def __init__(self, mac_address: str, year: int, number_of_week: int) -> None:
         week = Week(year, number_of_week)
@@ -112,7 +123,7 @@ class WeeklyStatistics(__Statistics):
         best_worker_id = max(performance_table, key=performance_table.get)
         return Worker.query.filter_by(id=best_worker_id).first()
 
-class DailyStatistics(__Statistics):
+class DailyStatistics(_Statistics):
     
     def __init__(self, mac_address: str, yaer: int, month: int, day: int) -> None:
         __start = date(yaer, month, day)
@@ -171,5 +182,6 @@ class DailyStatistics(__Statistics):
             results.append(self._get_measurements_for_period(current_time, current_time+step))
             
         return results
+
 
 

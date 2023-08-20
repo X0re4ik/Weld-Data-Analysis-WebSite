@@ -4,8 +4,9 @@ from flask_login import login_user, login_required, current_user
 from django.utils.http import url_has_allowed_host_and_scheme
 
 
-from ReadWeld import db 
+from ReadWeld import db
 from ReadWeld.models import Worker, Master, Welder
+from ReadWeld.utils import if_welder_not_exist_404
 
 from ReadWeld.users.utils import MasterLogin
 from ReadWeld.users.forms import WelderRegistration, WelderUpdate, MasterUpdate, MasterLoginForm
@@ -69,7 +70,7 @@ class WelderEditView(View):
     
     methods=['GET', 'POST']
     
-    decorators = [login_required]
+    decorators = [login_required, if_welder_not_exist_404]
     
     def __init__(self) -> None:
         self.template = "/".join(

@@ -1,29 +1,48 @@
 
 from typing import Any
-from ReadWeld.models import Sensor, DailyReport
+from ReadWeld.models import Sensor, DailyReport, Welder
 
 from functools import wraps
+
+from flask import redirect, abort, Response
 
 
 class SensorNotFoundException(Exception):
     def __init__(self, mac_address) -> None:
         self._message = f"Устройство с MAC адрессом - {mac_address} не найдено."
-    
-def r_if_sensor_not_exist(func) -> Any:
+
+
+class IfNotFound404:
+    def __init__(self, condition, message) -> None:
+        pass
+
+
+        
+
+ 
+def if_sensor_not_exist_404(func) -> Any:
     @wraps(func)
     def wrapper(*args, **kwargs):
         mac_address = kwargs["mac_address"]
         if not Sensor.query.filter(Sensor.mac_address==mac_address).first():
-            raise RuntimeError("!"*100)
+            return abort(404, f'Устройство с таким MAC-адрессом {mac_address} не найдено')
         return func(*args, **kwargs)
     return wrapper
 
+def if_welder_not_exist_404(func) -> Any:
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        welder_id = kwargs["id"]
+        if not Welder.query.filter(Welder.id==welder_id).first():
+            return abort(404, f'Сварщик не был найден')
+        return func(*args, **kwargs)
+    return wrapper
 
-
+from flask import request
 def r_if_daily_report_not_exist(func) -> Any:
     @wraps(func)
     def wrapper(*args, **kwargs):
-        mac_address = kwargs["mac_address"]
+        request.args.get('')
         if not DailyReport.query.filter(Sensor.mac_address==mac_address).first():
             raise RuntimeError("!"*100)
         return func(*args, **kwargs)

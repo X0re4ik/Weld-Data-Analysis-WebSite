@@ -7,7 +7,7 @@ from flask_login import (
 from flask.views import View
 
 
-from ReadWeld.utils import r_if_sensor_not_exist
+from ReadWeld.utils import if_sensor_not_exist_404
 
 PATH_TO_DB_WITH_SENSORS_FILES = Path(os.getenv("PATH_TO_DB_WITH_FILES")).joinpath("sensors")
 
@@ -15,7 +15,7 @@ class DownloadFileAPI(View):
     
     methods = ['GET']
     
-    decorators = [r_if_sensor_not_exist, login_required]
+    decorators = [if_sensor_not_exist_404, login_required]
     
     PATH_TO_DB_WITH_SENSORS_FILES: str
     

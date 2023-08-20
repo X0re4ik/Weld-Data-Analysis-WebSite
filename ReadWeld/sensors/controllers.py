@@ -18,7 +18,7 @@ from ReadWeld.sensors.utils import (
     DailyStatistics,
     NotFindRWSensorException
 )
-from ReadWeld.utils import r_if_sensor_not_exist
+from ReadWeld.utils import if_sensor_not_exist_404
 
 PATH_TO_DB_WITH_SENSORS_FILES = Path(os.getenv("PATH_TO_DB_WITH_FILES")).joinpath("sensors")
     
@@ -83,7 +83,7 @@ class SensorEditView(View):
     
     methods=['POST', "GET"]
     
-    decorators = [r_if_sensor_not_exist, login_required]
+    decorators = [if_sensor_not_exist_404, login_required]
     
     def __init__(self) -> None:
         self.template = "/".join(
@@ -123,13 +123,22 @@ class SensorEditView(View):
             masterID=current_user.get_id())
     
 
+from functools import wraps
 
+
+def _set_parameters_decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        args[0]._set_parameters(kwargs["mac_address"])
+        return func(*args, **kwargs)
+    return wrapper
 
 class _StatisticsView(View, ABC):
     
     methods = ["GET"]
     
-    decorators = [login_required, r_if_sensor_not_exist]
+    decorators = [login_required, if_sensor_not_exist_404,]
+
     
     def __init__(self, _type) -> None:
         title = "weekly" if _type == "w" else "daily"
@@ -137,20 +146,13 @@ class _StatisticsView(View, ABC):
         self.template = "/".join(
             ("sensors", "statistics", title)
         )
-        
         self._statistics = None
     
-    
-    def _setStatistics(self, statistics):
-        self._statistics = statistics
-
-    def _setRequestParameters(*args, **kwargs):
-        pass
-        
+    def _set_parameters(self, mac_address):
+        self._sensor = Sensor.query.filter(Sensor.mac_address==mac_address).first()
 
     def data_to_dict(self):
-        if not self._statistics:
-            raise RuntimeError("Объект статистики не определен для класа")
+        if not self._statistics: raise RuntimeError("Объект статистики не определен для класа")
         
         total_work_and_idle_time = list(self._statistics.calculation_work_and_idle_time())
         total_spent_wire_and_gas = list(self._statistics.calculation_of_spent_wire_and_gas())
@@ -164,9 +166,9 @@ class _StatisticsView(View, ABC):
             "performances": performances,
             "daily_reports": daily_reports
         }
-        
+    
+    @_set_parameters_decorator
     def dispatch_request(self, mac_address: str):
-        self.__later_init__(mac_address)
         statistics = self.data_to_dict()
         return render_template(self.template, statistics=statistics, masterID=current_user.get_id())
 
@@ -184,9 +186,12 @@ class WeeklyStatisticsView(_StatisticsView):
     def __init__(self) -> None:
         super().__init__('w')
         
-    def __later_init__(self, mac_address):       
+    def _set_parameters(self, mac_address):       
+        super()._set_parameters(mac_address)
+        
         year            = int(request.args.get("year"))
         number_of_week  = int(request.args.get("number_of_week"))
+        
         self._statistics = WeeklyStatistics(mac_address, year, number_of_week)
     
     def data_to_dict(self):
@@ -218,22 +223,25 @@ class DailyStatisticsView(_StatisticsView):
         super().__init__("d")
     
     
-    def __later_init__(self, mac_address):
+    def _set_parameters(self, mac_address: str):
+        super()._set_parameters(mac_address)
         
-        year            = int(request.args.get("year"))
-        month           = int(request.args.get("month"))
-        day             = int(request.args.get("day"))
-        self.interval        = int(request.args.get("interval") or 15)
+        year            = int(request.args.get("year")  or 1)
+        month           = int(request.args.get("month") or 1)
+        day             = int(request.args.get("day")   or 1)
+        
+        self._date      = datetime(year, month, day)
+        self._interval  = int(request.args.get("interval") or 15)
         
         self._statistics = DailyStatistics(mac_address, year, month, day)
     
     def data_to_dict(self):
         general_data = super().data_to_dict()
         
-        measurements = self._statistics.collect_measurements(self.interval)
+        measurements = self._statistics.collect_measurements(self._interval)
         return {
             **general_data,
-            "interval": self.interval,
+            "interval": self._interval,
             "measurements": {
                 "data": measurements,
                 "length": len(measurements)
@@ -247,7 +255,7 @@ class DailyStatisticsView(_StatisticsView):
 class ShowFilesView(View):
     
     methods = ["GET"]
-    decorators = [r_if_sensor_not_exist, login_required]
+    decorators = [if_sensor_not_exist_404, login_required]
     
     SUPPORTED_FORMATS = ['xlsx']
 
