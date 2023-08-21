@@ -80,15 +80,17 @@ from werkzeug.exceptions import HTTPException
 
 
 from flask import render_template
+from flask import redirect, url_for
+
 
 @app.errorhandler(404)
 def not_found_error(error_content):
-    return render_template('404.html', error_content=error_content)
+    return render_template('errors/404.html', error_content=error_content)
 
 
-# @app.errorhandler(Exception)
-# def handle_exception(error):
-#     if isinstance(error, HTTPException):
-#         return error
+@app.errorhandler(Exception)
+def handle_exception(error_content):
+    if isinstance(error_content, HTTPException):
+        return redirect(url_for('not_found_error', error_content=error_content))
     
-#     return render_template("error.html", error_description=error), 500
+    return render_template("errors/500.html", error_content=error_content), 500

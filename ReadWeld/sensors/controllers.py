@@ -224,9 +224,9 @@ class DailyStatisticsView(_StatisticsView):
     def _set_parameters(self, mac_address: str):
         super()._set_parameters(mac_address)
         
-        year            = int(request.args.get("year")  or 1)
-        month           = int(request.args.get("month") or 1)
-        day             = int(request.args.get("day")   or 1)
+        year            = int(request.args.get("year"))
+        month           = int(request.args.get("month"))
+        day             = int(request.args.get("day"))
         
         self._date      = datetime(year, month, day)
         self._interval  = int(request.args.get("interval") or 15)

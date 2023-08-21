@@ -6,17 +6,13 @@ from functools import wraps
 
 from flask import redirect, abort, Response
 
-
-class SensorNotFoundException(Exception):
-    def __init__(self, mac_address) -> None:
-        self._message = f"Устройство с MAC адрессом - {mac_address} не найдено."
+import json
 
 
-class IfNotFound404:
-    def __init__(self, condition, message) -> None:
-        pass
+from datetime import datetime, timedelta
 
-
+from ReadWeld.models import Master, Worker
+from flask import url_for
         
 
  
@@ -37,30 +33,6 @@ def if_welder_not_exist_404(func) -> Any:
             return abort(404, f'Сварщик не был найден')
         return func(*args, **kwargs)
     return wrapper
-
-from flask import request
-def r_if_daily_report_not_exist(func) -> Any:
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        request.args.get('')
-        if not DailyReport.query.filter(Sensor.mac_address==mac_address).first():
-            raise RuntimeError("!"*100)
-        return func(*args, **kwargs)
-    return wrapper
-
-
-
-class ErrorIfNotExsist:
-    def __init__(self, cls):
-        self._cls
-
-    def __call__(self, func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            if not self._cls.query.filter_by(**kwargs).first():
-                raise RuntimeError("Все плохо")
-            func(*args, **kwargs)
-        return wrapper
 
 
 
@@ -94,14 +66,6 @@ class WorkingWithFileDatabase:
         return cls.instance
 
 
-
-import json
-
-
-from datetime import datetime, timedelta
-
-from ReadWeld.models import Master, Worker
-from flask import url_for
 class JinjaHelper:
     
     def __new__(cls):

@@ -48,13 +48,17 @@
                             {% set href = "" %}
 
                         {% endif %}
+                        <img src="/static/img/base/user.svg" alt="User">               
                         <a href="{{href}}" class="user_name__value">{{title}}</a>
                     </h2>
-                    <a class="user_exit" href={{url_for('users.logout')}} >Выйти</a>
+                    <a class="user_exit" href={{url_for('users.logout')}}>
+                        <img src="/static/img/base/exit.svg" alt="Exit">
+                    </a>
                     <script>
 
                     </script>
                 </div>
+
                 <ul class="menu">
                     {% set navigation_bar_blocks = {
                         "Сварщики": {
