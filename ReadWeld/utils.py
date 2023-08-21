@@ -66,6 +66,79 @@ class WorkingWithFileDatabase:
         return cls.instance
 
 
+from ReadWeld.models import (
+    WeldingWireDiameter, WeldMetal, WeldingGas, 
+    Worker, Master)
+
+from ReadWeld.models import db
+from typing import List, Tuple, Mapping, Optional
+
+class FillDBWithStandardValues:
+    
+    STANDARD_WELDING_WIRE_DIAMETERS: List[float] = [0.8, 1.0, 1.2, 1.4, 1.6, 2.0]
+    WELDING_WIRES_METAL_AND_IT_DENSITIES: List[Tuple] = [
+        ("Сталь", 7700), 
+        ("Медь", 8.93*10**3)
+    ]
+    WELDING_GASES: List[str] = ["Аргон", "Углекислота"]
+    
+    SCHEME_TABLE_VALUES: Optional[Mapping[db.Model, List]] = None
+    
+    def __init__(self):
+        if self.__class__.SCHEME_TABLE_VALUES is None:
+            raise RuntimeError("Схема создания не определена")
+    
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(FillDBWithStandardValues, cls).__new__(cls)
+        return cls.instance
+        
+    def fill_table__WeldingWireDiameter(self):
+        for standard_welding_wire_diameter in self.__class__.STANDARD_WELDING_WIRE_DIAMETERS:
+            welding_wire_diameter = WeldingWireDiameter(diameter=standard_welding_wire_diameter)
+            self.add_and_commit_in_db(welding_wire_diameter)
+
+    
+    def fill_table__WeldMetal(self):
+        for steel_name, density in self.__class__.WELDING_WIRES_METAL_AND_IT_DENSITIES:
+            weld_metal = WeldMetal(steel_name=steel_name, density=density)
+            self.add_and_commit_in_db(weld_metal)
+
+
+    def fill_table__WeldingGas(self):
+        for welding_gas in self.__class__.WELDING_GASES:
+            self.add_and_commit_in_db(WeldingGas(name=welding_gas))
+
+
+    def fill_table__Master(self):
+        worker_id = self.add_and_commit_in_db(Worker(first_name="Anton", second_name="Mochalov", phone="+79923458625"))
+        master_id = self.add_and_commit_in_db(Master(email="ZIT@yandex.ru", password="ZIT", notification=False, worker_id=worker_id))
+            
+    def __fill(self):
+        for table, method_ in self.__class__.SCHEME_TABLE_VALUES.items():
+            if not table.query.filter_by().first():
+                method_(self)
+    
+    @staticmethod
+    def fill():
+        FillDBWithStandardValues().__fill()
+    
+        
+    @staticmethod
+    def add_and_commit_in_db(row) -> int:
+        db.session.add(row)
+        db.session.commit()
+        return row.id
+
+
+FillDBWithStandardValues.SCHEME_TABLE_VALUES: Mapping[db.Model, List] = {
+        WeldingWireDiameter: FillDBWithStandardValues.fill_table__WeldingWireDiameter,
+        WeldMetal: FillDBWithStandardValues.fill_table__WeldMetal,
+        WeldingGas: FillDBWithStandardValues.fill_table__WeldingGas,
+        Master: FillDBWithStandardValues.fill_table__Master
+}
+
+
 class JinjaHelper:
     
     def __new__(cls):

@@ -1,31 +1,28 @@
+from pathlib import Path
+READ_WELD_WORKDIR = Path('.').parent.absolute() #Рабочая директория для web-приложения
 
-
-
-
+from flask import Flask, render_template, redirect, url_for
 from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy()
+from werkzeug.exceptions import HTTPException
+
+from ReadWeld.config import NAME_DB_WITH_FILES, Config, TestConfig
+from ReadWeld.utils import WorkingWithFileDatabase, jinja_helper, FillDBWithStandardValues
+
+WorkingWithFileDatabase.NAME = NAME_DB_WITH_FILES   # Название папки для хранения файлов в файловой системе
+                                                    # - <NAME>
+                                                    # - web
+                                                    #   - ReadWeld
+                                                    #   - run.py
+
 login_manager = LoginManager()
 login_manager.login_view = 'users.login_master'
 
-from flask_sqlalchemy import SQLAlchemy
-db = SQLAlchemy()
 
-
-from pathlib import Path 
-READ_WELD_WORKDIR = Path('.').parent.absolute()
-
-
-from ReadWeld.config import NAME_DB_WITH_FILES 
-from ReadWeld.utils import WorkingWithFileDatabase
-WorkingWithFileDatabase.NAME = NAME_DB_WITH_FILES
-from ReadWeld.utils import jinja_helper
-from ReadWeld.models import InitDataBase
-from ReadWeld.config import Config, TestConfig
-
-from flask import Flask
 class AppCreator:
     
     app = Flask(__name__)
-    
     
     def attach_config(self):
         self.__class__.app.config.from_object(Config)
@@ -41,7 +38,6 @@ class AppCreator:
         self.__class__.app.app_context().push()
         with self.__class__.app.app_context():
             db.create_all()
-        InitDataBase()
         return self
     
     def attach_blueprints(self):
@@ -54,7 +50,12 @@ class AppCreator:
         from ReadWeld.api.routes import api
         self.__class__.app.register_blueprint(api)
         return self
-        
+    
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(AppCreator, cls).__new__(cls)
+        return cls.instance
+    
     @staticmethod
     def get():
         """
@@ -68,20 +69,9 @@ class AppCreator:
             
         return app_creator.app
         
-                
-        
 app = AppCreator.get()
 
-
-
-
-
-from werkzeug.exceptions import HTTPException
-
-
-from flask import render_template
-from flask import redirect, url_for
-
+FillDBWithStandardValues.fill()
 
 @app.errorhandler(404)
 def not_found_error(error_content):
