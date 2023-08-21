@@ -1247,3 +1247,6 @@ footer img {
     text-decoration: underline;
   }
 }
+
+a:active{color: #111;} 
+a:visited{color:#111;}

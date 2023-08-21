@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-DOTENV_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), ".web.env")
+DOTENV_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), ".dev.env")
 if os.path.exists(DOTENV_PATH):
     load_dotenv(DOTENV_PATH)
 else:

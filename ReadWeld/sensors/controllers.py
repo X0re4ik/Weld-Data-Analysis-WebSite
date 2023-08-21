@@ -250,9 +250,9 @@ class DailyStatisticsView(_StatisticsView):
 
 
 from typing import Optional, List
-from ReadWeld.utils import WorkingWithFileDatabase
+from ReadWeld.utils import working_with_file_db
 
-class ShowFilesView(View, WorkingWithFileDatabase):
+class ShowFilesView(View):
     
     methods = ["GET"]
     decorators = [login_required, if_sensor_not_exist_404]
@@ -260,15 +260,14 @@ class ShowFilesView(View, WorkingWithFileDatabase):
     SUPPORTED_FORMATS: List = ['xlsx']
     
     def __init__(self) -> None:
-        super().__init__()
+        View.__init__(self)
         
         self._template = "/".join(
             ("sensors", "statistics", "files.html")
         )
 
     def dispatch_request(self, mac_address: str):
-        
-        path_to_dir_with_sensor_data = Path(self.PATH_TO_FILES_WITH_SENSORS).joinpath(mac_address)
+        path_to_dir_with_sensor_data = Path(working_with_file_db.PATH_TO_FILES_WITH_SENSORS).joinpath(mac_address)
         path_to_dir_with_sensor_data.mkdir(exist_ok=True)
         files = []
         for path_to_file in path_to_dir_with_sensor_data.iterdir():

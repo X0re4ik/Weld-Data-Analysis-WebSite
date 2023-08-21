@@ -15,6 +15,7 @@ WorkingWithFileDatabase.NAME = NAME_DB_WITH_FILES   # Название папк�
                                                     # - web
                                                     #   - ReadWeld
                                                     #   - run.py
+WorkingWithFileDatabase()
 
 login_manager = LoginManager()
 login_manager.login_view = 'users.login_master'
@@ -78,9 +79,9 @@ def not_found_error(error_content):
     return render_template('errors/404.html', error_content=error_content)
 
 
-@app.errorhandler(Exception)
-def handle_exception(error_content):
-    if isinstance(error_content, HTTPException):
-        return redirect(url_for('not_found_error', error_content=error_content))
+# @app.errorhandler(Exception)
+# def handle_exception(error_content):
+#     if isinstance(error_content, HTTPException):
+#         return redirect(url_for('not_found_error', error_content=error_content))
     
-    return render_template("errors/500.html", error_content=error_content), 500
+#     return render_template("errors/500.html", error_content=error_content), 500

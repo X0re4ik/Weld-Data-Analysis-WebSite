@@ -54,6 +54,7 @@ class WorkingWithFileDatabase:
             raise ValueError("NAME не определен")
 
         self.__class__.FILE_DATABASE = Path.joinpath(READ_WELD_WORKDIR.parent.absolute(), self.__class__.NAME)
+        self.__class__.FILE_DATABASE.mkdir(exist_ok=True)
         for dir in self.__class__.DIRS:
             path_to = Path.joinpath(self.__class__.FILE_DATABASE, dir)
             path_to.mkdir(exist_ok=True)
@@ -65,6 +66,9 @@ class WorkingWithFileDatabase:
             cls.instance = super(WorkingWithFileDatabase, cls).__new__(cls)
         return cls.instance
 
+from ReadWeld.config import NAME_DB_WITH_FILES
+WorkingWithFileDatabase.NAME = NAME_DB_WITH_FILES
+working_with_file_db = WorkingWithFileDatabase()
 
 from ReadWeld.models import (
     WeldingWireDiameter, WeldMetal, WeldingGas, 
@@ -197,7 +201,6 @@ class JinjaHelper:
     
     @staticmethod
     def worker(worker_in_dict: dict):
-        print(worker_in_dict)
         value = worker_in_dict["first_name"] + " " + worker_in_dict["second_name"]
         value = "{0} {1} ({2})".format(
             worker_in_dict["first_name"],
