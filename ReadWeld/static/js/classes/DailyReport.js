@@ -73,14 +73,6 @@ DailyReport.prototype.linkToDailyStats = function() {
 }
 
 DailyReport.prototype.createForHTML = function(parent) {
-    let newH2 = document.createElement("h2");
-    newH2.className = "stat_title";
-    let newSpan10 = document.createElement("span");
-
-    newSpan10.innerHTML = `${this.date.getFullYear()}/${this.date.getMonth()+1}/${this.date.getDate()}`;
-    
-    newH2.appendChild(newSpan10)
-    parent.appendChild(newH2)
 
     const variables = [
         {
@@ -158,9 +150,9 @@ DailyReport.prototype.createForHTML = function(parent) {
     });
 
 
-    let newLink = document.createElement("a");
-    newLink.innerHTML = "Подробнее";
-    newLink.target = "_black";
-    newLink.href = this.linkToDailyStats();
-    parent.appendChild(newLink)
+    // let newLink = document.createElement("a");
+    // newLink.innerHTML = "Подробнее";
+    // newLink.target = "_black";
+    // newLink.href = this.linkToDailyStats();
+    // parent.appendChild(newLink)
 }

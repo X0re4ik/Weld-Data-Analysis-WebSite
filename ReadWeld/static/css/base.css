@@ -427,8 +427,8 @@ section {
   width: 100%;
   max-width: 1200px;
   min-width: 320px;
-  height: 250px;
-  background-color: #c5c5c5;
+  height: 400px;
+  background-color: #ffffff;
   overflow: hidden;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -448,7 +448,7 @@ section {
       -ms-flex-positive: 1;
           flex-grow: 1;
   margin: 0;
-  height: 250px;
+  height: 300px;
 }
 
 .stat_pic img {

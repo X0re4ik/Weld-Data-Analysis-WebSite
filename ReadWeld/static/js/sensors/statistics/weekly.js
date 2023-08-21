@@ -35,7 +35,7 @@ class PageHandle {
 
 
     tableForMainChart(dailyReport) {
-        let parent = document.getElementsByClassName('stat_details__col')[1];
+        let parent = document.getElementById('for-data');
         while (parent.firstChild) {
             parent.removeChild(parent.firstChild);
         }
