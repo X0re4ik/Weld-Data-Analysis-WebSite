@@ -251,6 +251,8 @@ class DailyStatisticsView(_StatisticsView):
 
 from typing import Optional, List
 from ReadWeld.utils import working_with_file_db
+from flask import request
+from flask_paginate import Pagination, get_page_parameter
 
 class ShowFilesView(View):
     
@@ -258,6 +260,7 @@ class ShowFilesView(View):
     decorators = [login_required, if_sensor_not_exist_404]
     
     SUPPORTED_FORMATS: List = ['xlsx']
+    LIMIT: int = 25
     
     def __init__(self) -> None:
         View.__init__(self)
@@ -267,6 +270,14 @@ class ShowFilesView(View):
         )
 
     def dispatch_request(self, mac_address: str):
+        search = False
+        q = request.args.get('q')
+        if q:
+            search = True
+
+        number_of_page = request.args.get(get_page_parameter(), type=int, default=1)
+        
+        
         path_to_dir_with_sensor_data = Path(working_with_file_db.PATH_TO_FILES_WITH_SENSORS).joinpath(mac_address)
         path_to_dir_with_sensor_data.mkdir(exist_ok=True)
         files = []
@@ -281,8 +292,15 @@ class ShowFilesView(View):
                     }
                 )
         
+        pagination = Pagination(
+            page=number_of_page, 
+            total=len(files), 
+            search=search, per_page=self.__class__.LIMIT)
+
+        files = files[(number_of_page-1)*self.__class__.LIMIT:number_of_page*self.__class__.LIMIT]
         return render_template(
             self._template,
             mac_address=mac_address,
             files=files,
+            pagination=pagination,
             masterID=current_user.get_id())

@@ -1,8 +1,22 @@
 {% extends "base.html" %}
 
 {% block main_content %}
-    <h1>Кладовка</h1>
-    {% for file in files %}
-        <a href="{{url_for('api.download-file', mac_address=mac_address, file_name=file.xlsx)}}">{{file.xlsx}}</a>
-    {% endfor %}
+<div class="headline headline_left">
+    <h1 class="title2">
+        Кладовка
+    </h1>
+    <h2 class="stat_title">Устройство: {{mac_address}}</h2>
+</div>
+<div class="grid_year">
+    <div class="grid_month">
+        {% for file in files %}
+            <div class="grid_day">
+                <a href="{{url_for('api.download-file', mac_address=mac_address, file_name=file.xlsx)}}">{{file.title}}</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{{ pagination.links }}
+
 {% endblock %}

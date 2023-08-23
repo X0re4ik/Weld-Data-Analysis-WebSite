@@ -10,6 +10,25 @@
   list-style-type: none;
 }
 
+
+.pagination {
+  display: inline-block;
+}
+
+.pagination a {
+  color: black;
+  float: left;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+
+.pagination a.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.pagination a:hover:not(.active) {background-color: #ddd;}
+
 a:hover {
   opacity: 0.6;
   -webkit-transition: 0.5s;
@@ -845,17 +864,13 @@ footer img {
 }
 
 .grid_month {
-  display: none;
+  display: -ms-grid;
+  display: grid;
   border: 1px solid #373d44;
   -ms-grid-columns: minmax(40px, 1fr) 1px minmax(40px, 1fr) 1px minmax(40px, 1fr) 1px minmax(40px, 1fr) 1px minmax(40px, 1fr) 1px minmax(40px, 1fr) 1px minmax(40px, 1fr);
   grid-template-columns: repeat(7, minmax(40px, 1fr));
   grid-gap: 1px;
   background-color: #373d44;
-}
-
-.grid_month.active {
-  display: -ms-grid;
-  display: grid;
 }
 
 .grid_day {
